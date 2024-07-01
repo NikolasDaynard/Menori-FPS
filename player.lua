@@ -60,19 +60,42 @@ function player:update(dt)
     end
     local col = collision:checkCollisions({p1 = self.position, p2 = (self.position + vec3(1, 1, 1))})
     if col then
-        collisionVector = collision:vectorToPoint(collision:colliderCenter(col), collision:colliderCenter({p1 = self.position, p2 = (self.position + vec3(1, 1, 1))}))
-        if collisionVector.y >= -.1 then
-            -- self.position.y = math.min(self.position.y - collisionVector.y / 10, 5)
-            -- self.position.z = math.min(self.position.z - collisionVector.z / 10, 5)
-            -- self.position.x = math.min(self.position.x - collisionVector.x / 10, 5)
+        collisionVector = collision:vectorToPoint(collision:colliderCenter(col), collision:colliderCenter({p1 = self.position, p2 = self.position}))
+        if collisionVector.y >= -.2 then
+            self.position.y = math.min(self.position.y - collisionVector.y / 10, 5)
+            self.position.z = math.min(self.position.z - collisionVector.z / 10, 5)
+            self.position.x = math.min(self.position.x - collisionVector.x / 10, 5)
+    
+            self.momentum.x = math.min(self.momentum.x - collisionVector.x / 1, 5)
+            self.momentum.y = math.min(self.momentum.y - collisionVector.x / 1, 5)
+            self.momentum.z = math.min(self.momentum.z - collisionVector.x / 1, 5)
         else
             self.touchingGround = true
             self.momentum.y = 0
         end
-        self.position.y = math.min(self.position.y - collisionVector.y / 10, 5)
-        self.position.z = math.min(self.position.z - collisionVector.z / 10, 5)
-        self.position.x = math.min(self.position.x - collisionVector.x / 10, 5)
+        momentumVector = self.momentum / (math.max(math.max(math.abs(self.momentum.x), math.abs(self.momentum.y)), math.abs(self.momentum.z)))
+
+
+
     end
+    -- local col = collision:checkCollisions({p1 = self.position, p2 = (self.position + vec3(1, 1, 1))})
+    -- if col then
+    --     local colliderCenter1 = collision:colliderCenter({p1 = self.position, p2 = (self.position + vec3(1, 1, 1))})
+    --     local colliderCenter2 = collision:colliderCenter(col)
+    --     collisionVector = collision:vectorToPoint(colliderCenter2, colliderCenter1)
+    
+    --     local normal = collisionVector
+    
+    --     local velocityDotNormal = self.momentum:dot(normal)
+    --     print(velocityDotNormal)
+    --     local reflectedMomentum = self.momentum - (2 * velocityDotNormal * normal)
+    
+    --     reflectedMomentum = reflectedMomentum * .5
+    
+    --     self.momentum = -reflectedMomentum
+    
+    --     self.position = self.position + normal * .01
+    -- end
 end
 
 function player:updateCam(dx, dy)

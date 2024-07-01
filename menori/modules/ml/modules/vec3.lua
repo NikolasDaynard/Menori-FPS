@@ -146,6 +146,10 @@ function vec3_mt:set_from_matrix_position(m)
 	self.z = m.e[15]
 end
 
+function vec3_mt:dot(v)
+    return self.x * v.x + self.y * v.y + self.z * v.z
+end
+
 -- vec3 operator overloading --
 
 function vec3_mt.__unm(a)
