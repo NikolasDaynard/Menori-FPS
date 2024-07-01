@@ -19,10 +19,6 @@ player = {
 
 player.movementSpeed = player.movementSpeed * (1 / player.drag) -- adust for drag
 
-function player:getPosition()
-    return self.position
-end
-
 function player:move(x, y, dt)
     y = -y
     dt = dt or .016
@@ -31,6 +27,7 @@ function player:move(x, y, dt)
 end
 
 function player:update(dt)
+    self.position = self.position + self.momentum * dt
     if love.keyboard.isDown("lshift") then
         self.drag = 1
     else
@@ -50,19 +47,29 @@ function player:update(dt)
             player:move(1, 0, dt)
         end
     end
-    self.position = self.position + self.momentum * dt
 
     self.momentum.y = self.momentum.y - 2
     if love.keyboard.isDown("space") and self.touchingGround then
         self.touchingGround = false
         player.momentum.y = player.momentum.y + self.jumpForce
     end
-    if self.position.y < 0 then
-        self.position.y = 0
+    if self.position.y < 1 then
+        self.position.y = 1
         self.momentum.y = 0
         self.touchingGround = true
-    end 
-    collision:bbcollide(self.position, self.position + vec3(1, 1, 1), vec3(0, 0, 0), vec3(10, 10, 10))
+    end
+    if collision:bbcollide(self.position, self.position + vec3(1, 1, 1), vec3(0, 0, 0), vec3(3, 3, 3)) then
+        collisionVector = collision:vectorToPoint(vec3(1.5, 1.5, 1.5), self.position + vec3(.5, .5, .5))
+
+        if collisionVector.y >= -.1 then
+            self.position.y = math.min(self.position.y - collisionVector.y / 10, 5)
+            self.position.z = math.min(self.position.z - collisionVector.z / 10, 5)
+            self.position.x = math.min(self.position.x - collisionVector.x / 10, 5)
+        else
+            self.touchingGround = true
+            self.momentum.y = 0
+        end
+    end
 end
 
 function player:updateCam(dx, dy)
@@ -77,4 +84,7 @@ function player:getXAngle()
 end
 function player:getYAngle()
     return self.cameraAngle.y
+end
+function player:getPosition()
+    return self.position
 end
