@@ -10,7 +10,8 @@ local primitives = require "primitives"
 
 require("enemy")
 
-local map, background, player
+local map, background
+player = {}
 local canvas
 local accumulator = 0
 local frametime = 1/60
@@ -48,7 +49,7 @@ function love.update(dt)
         accumulator = accumulator - frametime
         player:update(dt)
     end
-    enemy:update()
+    enemy:update(dt)
 
     -- interpolate player between frames
     -- to stop camera jitter when fps and timestep do not match

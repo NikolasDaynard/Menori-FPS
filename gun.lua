@@ -1,10 +1,18 @@
 local g3d = require "g3d"
 local collisions = require "g3d/collisions"
-gun = {}
+gun = {
+    currentTime = 0,
+    firerate = 1
+}
 local gunMesh = g3d.newModel("assets/gu.obj", "assets/tileset.png", nil, nil, {-1, -1, 1})
 local hitMesh = g3d.newModel("assets/icoSphere.obj", "assets/tileset.png", nil, nil, {-1, -1, 1})
 
 function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVectorY, cameraLookVectorZ, collisionModels)
+    if self.currentTime < self.firerate then
+        return
+    end
+    self.currentTime = 0
+
     collisionModels = entityHolder:getEntities()
     local intersection = {}
     intersection.distance = math.huge
@@ -23,6 +31,10 @@ function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVector
             entity.health = entity.health - 1
         end
     end
+end
+
+function gun:update(dt)
+    self.currentTime = self.currentTime + dt
 end
 
 function gun:render()

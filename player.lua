@@ -107,7 +107,8 @@ function Player:moveAndSlide(mx,my,mz)
     return mx, my, mz, nx, ny, nz
 end
 
-function Player:update()
+function Player:update(dt)
+    gun:update(dt)
     -- collect inputs
     local moveX, moveY = 0, 0
     local speed = .05
@@ -192,9 +193,10 @@ function Player:update()
 
     _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
     -- clip check
-    if self.speed.y > 0 and self:collisionTest(0, -.1, 0, .1) then
-        self.speed.y = 0 
-        self.position.y = self.position.y - 1
+    if self.speed.y > 0 and self:collisionTest(0.5, -.1, 0.5, .1) then
+        -- print("clip")
+        self.position.y = self.position.y - math.max(self.speed.y * 2, 1)
+        self.speed.y = 0
     end
 
     -- ground check
