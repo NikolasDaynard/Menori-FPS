@@ -17,7 +17,8 @@ local rollingAverage = {}
 function love.load()
     lg.setBackgroundColor(0.25,0.5,1)
 
-    map = g3d.newModel("assets/map.obj", "assets/tileset.png", nil, nil, {-1,-1,1})
+    map = g3d.newModel("assets/clean.obj", "assets/tileset.png", nil, nil, {-1,-1,1})
+    gunMesh = g3d.newModel("assets/guncomb.obj", "assets/tileset.png", nil, nil, {-1, -1, 1})
     background = g3d.newModel("assets/sphere.obj", "assets/starfield.png", {0,0,0}, nil, {500,500,500})
     player = Player:new(0,0,0)
     player:addCollisionModel(map)
@@ -85,6 +86,7 @@ function love.draw()
     --lg.setDepthMode("lequal", true)
     map:draw()
     background:draw()
+    gunMesh:draw()
 
     drawTree(1,0.5,0)
     drawTree(0,0.5,1.5)

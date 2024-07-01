@@ -13,9 +13,11 @@ local function concatTables(t1,t2,t3)
     for i,v in ipairs(t1) do
         ret[#ret +1] = v
     end
+
     for i,v in ipairs(t2) do
         ret[#ret +1] = v
     end
+
     for i,v in ipairs(t3) do
         ret[#ret +1] = v
     end

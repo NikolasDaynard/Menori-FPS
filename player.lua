@@ -129,10 +129,11 @@ function Player:update()
     if love.keyboard.isDown("lshift") then
         if not self.slidingVector then
             self.slidingVector = {self.speed.x * 1.2, self.speed.z * 1.2}
-            self.height = .7
+            self.height = .01
         end
     else
         self.slidingVector = nil
+        self.height = 1
     end
 
     if love.keyboard.isDown("space") and self.onGround then
@@ -172,7 +173,7 @@ function Player:update()
 
     -- smoothly walk down slopes
     if not self.onGround and wasOnGround and self.speed.y > 0 then
-        local len, x, y, z, nx, ny, nz = self:collisionTest(0,self.stepDownSize,0)
+        local len, x, y, z, nx, ny, nz = self:collisionTest(0, self.stepDownSize, 0)
         local mx, my, mz = 0, self.stepDownSize, 0
         if len then
             -- do the position change only if a collision was actually detected
@@ -203,7 +204,7 @@ function Player:update()
     self.lastSpeed.y = self.speed.y
     self.lastSpeed.z = self.speed.z
     g3d.camera.position[1] = self.position.x
-    g3d.camera.position[2] = self.position.y
+    g3d.camera.position[2] = self.position.y - .5 * self.height
     g3d.camera.position[3] = self.position.z
     g3d.camera.lookInDirection()
 end
@@ -214,7 +215,7 @@ function Player:interpolate(fraction)
     -- visual difference between the interpolated position and the real position
 
     g3d.camera.position[1] = self.position.x + self.speed.x*fraction
-    g3d.camera.position[2] = self.position.y + self.speed.y*fraction
+    -- g3d.camera.position[2] = (self.position.y + self.speed.y*fraction) - .25 * self.height
     g3d.camera.position[3] = self.position.z + self.speed.z*fraction
 
     g3d.camera.lookInDirection()
