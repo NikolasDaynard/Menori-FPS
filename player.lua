@@ -141,9 +141,8 @@ function Player:update()
         if self.onGround then
             self.speed.y = self.speed.y - jump
         else
-            local len, x,y,z, nx,ny,nz
             for _,model in ipairs(self.collisionModels) do
-                len, x,y,z, nx,ny,nz = model:capsuleIntersection(
+                local len, x,y,z, nx,ny,nz = model:capsuleIntersection(
                     self.position.x + .1,
                     self.position.y + .1 - 0.15 * self.height,
                     self.position.z + .1,
@@ -152,17 +151,15 @@ function Player:update()
                     self.position.z - .1,
                     0.3
                 )
-                if len ~= nil then
+                if len ~= nil and self.speed.y >= 0 then
+                    self.speed.y = self.speed.y - jump
+    
+                    local vector = {self.position.x - x, self.position.z - z}
+                    local vectorX, _, vectorZ = vectors.normalize(vector[1], 0, vector[2])
+                    self.speed.x = self.speed.x + vectorX
+                    self.speed.z = self.speed.z + vectorZ
                     break
                 end
-            end
-            if len ~= nil then
-                self.speed.y = self.speed.y - jump
-
-                local vector = {self.position.x - x, self.position.z - z}
-                local vectorX, _, vectorZ = vectors.normalize(vector[1], 0, vector[2])
-                self.speed.x = self.speed.x + vectorX
-                self.speed.z = self.speed.z + vectorZ
             end
         end
     end
@@ -192,7 +189,10 @@ function Player:update()
 
     -- vertical movement and collision check
 
-    _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
+    _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y / 2, 0)
+    -- if self.speed.y > 0 and se:collisionTest(0, -.1, 0) then
+    --     print("clipping")
+    -- end
 
     -- ground check
     local wasOnGround = self.onGround
