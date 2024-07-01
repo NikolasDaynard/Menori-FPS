@@ -58,17 +58,20 @@ function player:update(dt)
         self.momentum.y = 0
         self.touchingGround = true
     end
-    if collision:bbcollide(self.position, self.position + vec3(1, 1, 1), vec3(0, 0, 0), vec3(3, 3, 3)) then
-        collisionVector = collision:vectorToPoint(vec3(1.5, 1.5, 1.5), self.position + vec3(.5, .5, .5))
-
+    local col = collision:checkCollisions({p1 = self.position, p2 = (self.position + vec3(1, 1, 1))})
+    if col then
+        collisionVector = collision:vectorToPoint(collision:colliderCenter(col), collision:colliderCenter({p1 = self.position, p2 = (self.position + vec3(1, 1, 1))}))
         if collisionVector.y >= -.1 then
-            self.position.y = math.min(self.position.y - collisionVector.y / 10, 5)
-            self.position.z = math.min(self.position.z - collisionVector.z / 10, 5)
-            self.position.x = math.min(self.position.x - collisionVector.x / 10, 5)
+            -- self.position.y = math.min(self.position.y - collisionVector.y / 10, 5)
+            -- self.position.z = math.min(self.position.z - collisionVector.z / 10, 5)
+            -- self.position.x = math.min(self.position.x - collisionVector.x / 10, 5)
         else
             self.touchingGround = true
             self.momentum.y = 0
         end
+        self.position.y = math.min(self.position.y - collisionVector.y / 10, 5)
+        self.position.z = math.min(self.position.z - collisionVector.z / 10, 5)
+        self.position.x = math.min(self.position.x - collisionVector.x / 10, 5)
     end
 end
 

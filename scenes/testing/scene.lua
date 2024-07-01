@@ -1,6 +1,7 @@
 local menori = require 'menori'
 require("player")
 require("helpers")
+require("collision")
 
 local ml = menori.ml
 local vec3 = ml.vec3
@@ -41,25 +42,28 @@ function scene:init()
 	local lighting_frag = menori.utils.shader_preprocess(love.filesystem.read('basic_lighting/basic_lighting_frag.glsl'))
 	local lighting_shader = love.graphics.newShader(menori.ShaderUtils.cache['default_mesh_vert'], lighting_frag)
 
-	local gltf = menori.glTFLoader.load('assets/pokemon_firered_-_players_room.glb')
+	local gltf = menori.glTFLoader.load('assets/clean.glb')
 	local scenes = menori.NodeTreeBuilder.create(gltf, function (scene, builder)
 		-- Callback for each scene in the gltf.
 		-- Create AABB for each node and add it to the aabb_root node.
 		scene:traverse(function (node)
 			if node.mesh then
+				-- collision:collisionSetCollider(collision:generateAABBFromVerts(node.mesh:get_vertices()), node)
 				node.material.shader = lighting_shader
 
-				-- local bound = node:get_aabb()
-				-- local size = bound:size()
-				-- local boxshape = menori.BoxShape(size.x, size.y, size.z)
-				-- local material = menori.Material()
-				-- material.wireframe = true
-				-- material.mesh_cull_mode = 'none'
-				-- material.alpha_mode = 'BLEND'
-				-- material:set('baseColor', {1.0, 1.0, 0.0, 0.12})
-				-- local t = menori.ModelNode(boxshape, material)
-				-- t:set_position(bound:center())
-				-- self.aabb_root:attach(t)
+				local bound = node:get_aabb()
+
+				collision:collisionSetCollider({p1 = vec3(bound.min.x, bound.min.y, bound.min.z), p2 = vec3(bound.max.x, bound.max.y, bound.max.z)})
+				local size = bound:size()
+				local boxshape = menori.BoxShape(size.x, size.y, size.z)
+				local material = menori.Material()
+				material.wireframe = true
+				material.mesh_cull_mode = 'none'
+				material.alpha_mode = 'BLEND'
+				material:set('baseColor', {1.0, 1.0, 0.0, 0.12})
+				local t = menori.ModelNode(boxshape, material)
+				t:set_position(bound:center())
+				self.aabb_root:attach(t)
 			end
 		end)
 	end)
@@ -92,7 +96,7 @@ end
 -- camera control
 function scene:mousemoved(x, y, dx, dy)
 	player:updateCam(dx, dy)
-	
+
 	local _, _, w, h = menori.app:get_viewport()
 	wrapCursor(w, h)
 end
