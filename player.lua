@@ -29,6 +29,8 @@ function Player:new(x,y,z)
     self.normal = {x = 0, y = 1, z = 0}
     self.radius = 0.2
     self.onGround = false
+    self.slidingVector = nil
+    self.height = 1
     self.stepDownSize = 0.075
     self.collisionModels = {}
 
@@ -48,10 +50,10 @@ function Player:collisionTest(mx,my,mz)
     for _,model in ipairs(self.collisionModels) do
         local len, x,y,z, nx,ny,nz = model:capsuleIntersection(
             self.position.x + mx,
-            self.position.y + my - 0.15,
+            self.position.y + my - 0.15 * self.height,
             self.position.z + mz,
             self.position.x + mx,
-            self.position.y + my + 0.5,
+            self.position.y + my + 0.5 * self.height,
             self.position.z + mz,
             0.2
         )
@@ -108,8 +110,8 @@ function Player:update()
     local moveX, moveY = 0, 0
     local speed = .05
     local friction = 0.75
-    local gravity = 0.04
-    local jump = .6
+    local gravity = 0.02
+    local jump = .5
     local maxFallSpeed = .3
 
     -- friction
@@ -123,24 +125,39 @@ function Player:update()
     if love.keyboard.isDown("a") then moveX = moveX - 1 end
     if love.keyboard.isDown("s") then moveY = moveY + 1 end
     if love.keyboard.isDown("d") then moveX = moveX + 1 end
+
+    if love.keyboard.isDown("lshift") then
+        if not self.slidingVector then
+            self.slidingVector = {self.speed.x * 1.2, self.speed.z * 1.2}
+            self.height = .7
+        end
+    else
+        self.slidingVector = nil
+    end
+
     if love.keyboard.isDown("space") and self.onGround then
         self.speed.y = self.speed.y - jump
     end
     if love.mouse.isDown(1) then
-        gun:fire(self.position.x, self.position.y, self.position.z, g3d.camera:getLookVector())
+        local vectorX, vectorY, vectorZ = g3d.camera:getLookVector()
+        gun:fire(self.position.x, self.position.y, self.position.z, vectorX, vectorY, vectorZ, self.collisionModels)
     end
 
     -- do some trigonometry on the inputs to make movement relative to camera's direction
     -- also to make the player not move faster in diagonal directions
-    if moveX ~= 0 or moveY ~= 0 then
+    if (moveX ~= 0 or moveY ~= 0) or self.slidingVector then
+        if not self.slidingVector then
+            ---@diagnostic disable-next-line: deprecated
+            local angle = math.atan2(moveY,moveX)
+            local direction = g3d.camera.getDirectionPitch()
+            local directionX, directionZ = math.cos(direction + angle)*speed, math.sin(direction + angle + math.pi)*speed
 
----@diagnostic disable-next-line: deprecated
-        local angle = math.atan2(moveY,moveX)
-        local direction = g3d.camera.getDirectionPitch()
-        local directionX, directionZ = math.cos(direction + angle)*speed, math.sin(direction + angle + math.pi)*speed
-
-        self.speed.x = self.speed.x + directionX
-        self.speed.z = self.speed.z + directionZ
+            self.speed.x = self.speed.x + directionX
+            self.speed.z = self.speed.z + directionZ
+        else
+            self.speed.x = self.slidingVector[1]
+            self.speed.z = self.slidingVector[2]
+        end
     end
 
     local _, nx, ny, nz
@@ -156,7 +173,7 @@ function Player:update()
     -- smoothly walk down slopes
     if not self.onGround and wasOnGround and self.speed.y > 0 then
         local len, x, y, z, nx, ny, nz = self:collisionTest(0,self.stepDownSize,0)
-        local mx, my, mz = 0,self.stepDownSize,0
+        local mx, my, mz = 0, self.stepDownSize, 0
         if len then
             -- do the position change only if a collision was actually detected
             self.position.y = self.position.y + my

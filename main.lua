@@ -94,5 +94,7 @@ function love.draw()
 
     lg.setCanvas()
     lg.draw(canvas[1], 1024/2, 576/2, 0, 1,-1, 1024/2, 576/2)
+    love.graphics.print("Current FPS: " .. tostring(love.timer.getFPS()), 10, 10)
+
     --lg.print(collectgarbage("count"))
 end
