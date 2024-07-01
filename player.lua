@@ -45,7 +45,8 @@ end
 
 -- collide against all models in my collision list
 -- and return the collision against the closest one
-function Player:collisionTest(mx,my,mz)
+function Player:collisionTest(mx, my, mz, rad)
+    rad = rad or .2
     local bestLength, bx,by,bz, bnx,bny,bnz
 
     for _,model in ipairs(self.collisionModels) do
@@ -113,7 +114,7 @@ function Player:update()
     local friction = 0.75
     local gravity = 0.02
     local jump = .5
-    local maxFallSpeed = .3
+    local maxFallSpeed = 3
 
     -- friction
     self.speed.x = self.speed.x * friction
@@ -189,10 +190,12 @@ function Player:update()
 
     -- vertical movement and collision check
 
-    _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y / 2, 0)
-    -- if self.speed.y > 0 and se:collisionTest(0, -.1, 0) then
-    --     print("clipping")
-    -- end
+    _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
+    -- clip check
+    if self.speed.y > 0 and self:collisionTest(0, -.1, 0, .1) then
+        self.speed.y = 0 
+        self.position.y = self.position.y - 1
+    end
 
     -- ground check
     local wasOnGround = self.onGround
@@ -253,6 +256,10 @@ end
 
 function Player:render()
     gun:render()
+end
+
+function Player:getPosition()
+    return self.position
 end
 
 return Player

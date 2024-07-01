@@ -8,6 +8,8 @@ local Player = require "player"
 local vectors = require "g3d/vectors"
 local primitives = require "primitives"
 
+require("enemy")
+
 local map, background, player
 local canvas
 local accumulator = 0
@@ -18,10 +20,10 @@ function love.load()
     lg.setBackgroundColor(0.25,0.5,1)
 
     map = g3d.newModel("assets/clean.obj", "assets/tileset.png", nil, nil, {-1,-1,1})
-    enemy = g3d.newModel("assets/enemy.obj", "assets/starfield.png", {-1,-3,0}, {180, 0, 0}, {1,1,1})
     background = g3d.newModel("assets/sphere.obj", "assets/starfield.png", {0,0,0}, nil, {500,500,500})
     player = Player:new(0,0,0)
     player:addCollisionModel(map)
+    entityHolder:addEntity({model = map}, 1)
 
     canvas = {lg.newCanvas(1024,576), depth=true}
 end
@@ -46,6 +48,7 @@ function love.update(dt)
         accumulator = accumulator - frametime
         player:update(dt)
     end
+    enemy:update()
 
     -- interpolate player between frames
     -- to stop camera jitter when fps and timestep do not match
@@ -86,8 +89,8 @@ function love.draw()
     --lg.setDepthMode("lequal", true)
     map:draw()
     background:draw()
-    enemy:draw()
     player:render()
+    enemy:render()
 
     drawTree(1,0.5,0)
     drawTree(0,0.5,1.5)

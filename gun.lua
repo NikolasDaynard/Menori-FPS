@@ -5,16 +5,23 @@ local gunMesh = g3d.newModel("assets/gu.obj", "assets/tileset.png", nil, nil, {-
 local hitMesh = g3d.newModel("assets/icoSphere.obj", "assets/tileset.png", nil, nil, {-1, -1, 1})
 
 function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVectorY, cameraLookVectorZ, collisionModels)
+    collisionModels = entityHolder:getEntities()
     local intersection = {}
     intersection.distance = math.huge
-    for _,model in ipairs(collisionModels) do
-        local distance, x, y, z, nx, ny, nz = model:rayIntersection(playerX, playerY - .3, playerZ, cameraLookVectorX, cameraLookVectorY, cameraLookVectorZ)
+    local hitModel = nil
+    for _,entity in pairs(collisionModels) do
+        local distance, x, y, z, nx, ny, nz = entity.model:rayIntersection(playerX, playerY - .3, playerZ, cameraLookVectorX, cameraLookVectorY, cameraLookVectorZ)
         if (distance or math.huge) < intersection.distance then
             intersection = {distance = distance, x = x, y = y, z = z, nx = nx, ny = ny, nz = nz}
+            hitModel = entity.model
         end
     end
-    if intersection.x then
+    if hitModel then
         hitMesh:setTranslation(intersection.x, intersection.y, intersection.z)
+        local entity = entityHolder:getEntityFromModel(hitModel)
+        if entity.health then
+            entity.health = entity.health - 1
+        end
     end
 end
 
