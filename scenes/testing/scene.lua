@@ -91,12 +91,8 @@ end
 
 -- camera control
 function scene:mousemoved(x, y, dx, dy)
-	-- if love.mouse.isDown(2) then
-	-- 	self.y_angle = self.y_angle - dy * 0.2
-	-- 	self.x_angle = self.x_angle - dx * 0.2
-	-- 	self.y_angle = ml_utils.clamp(self.y_angle, -45, 45)
-	-- end
 	player:updateCam(dx, dy)
+	
 	local _, _, w, h = menori.app:get_viewport()
 	wrapCursor(w, h)
 end
