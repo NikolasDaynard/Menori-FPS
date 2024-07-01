@@ -4,6 +4,7 @@
             "jit"
       ],
       "Lua.diagnostics.disable": [
-            "lowercase-global"
+            "lowercase-global",
+            "duplicate-set-field"
       ]
 }
