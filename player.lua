@@ -1,4 +1,5 @@
 local g3d = require "g3d"
+local vectors = require "g3d/vectors"
 require("gun")
 
 -- TODO:
@@ -136,8 +137,34 @@ function Player:update()
         self.height = 1
     end
 
-    if love.keyboard.isDown("space") and self.onGround then
-        self.speed.y = self.speed.y - jump
+    if love.keyboard.isDown("space") then
+        if self.onGround then
+            self.speed.y = self.speed.y - jump
+        else
+            local len, x,y,z, nx,ny,nz
+            for _,model in ipairs(self.collisionModels) do
+                len, x,y,z, nx,ny,nz = model:capsuleIntersection(
+                    self.position.x + .1,
+                    self.position.y + .1 - 0.15 * self.height,
+                    self.position.z + .1,
+                    self.position.x - .1,
+                    self.position.y - .1 + 0.5 * self.height,
+                    self.position.z - .1,
+                    0.3
+                )
+                if len ~= nil then
+                    break
+                end
+            end
+            if len ~= nil then
+                self.speed.y = self.speed.y - jump
+
+                local vector = {self.position.x - x, self.position.z - z}
+                local vectorX, _, vectorZ = vectors.normalize(vector[1], 0, vector[2])
+                self.speed.x = self.speed.x + vectorX
+                self.speed.z = self.speed.z + vectorZ
+            end
+        end
     end
     if love.mouse.isDown(1) then
         local vectorX, vectorY, vectorZ = g3d.camera:getLookVector()
@@ -207,6 +234,9 @@ function Player:update()
     g3d.camera.position[2] = self.position.y - .5 * self.height
     g3d.camera.position[3] = self.position.z
     g3d.camera.lookInDirection()
+
+    local vectorX, vectorY, vectorZ = g3d.camera:getLookVector()
+    gun:updatePos(self.position.x, self.position.y - .2 * self.height, self.position.z, vectorX, vectorY, vectorZ)
 end
 
 function Player:interpolate(fraction)
@@ -219,6 +249,10 @@ function Player:interpolate(fraction)
     g3d.camera.position[3] = self.position.z + self.speed.z*fraction
 
     g3d.camera.lookInDirection()
+end
+
+function Player:render()
+    gun:render()
 end
 
 return Player
