@@ -65,7 +65,8 @@ local function triangleRay(
     end
 
     local s1,s2,s3 = fastSubtract(src_x,src_y,src_z, tri_0_x,tri_0_y,tri_0_z)
-    local u = vectorDotProduct(s1,s2,s3, h1,h2,h3) / a
+    local i_a = 1 / a
+    local u = vectorDotProduct(s1,s2,s3, h1,h2,h3) * i_a
 
     -- ray does not intersect triangle
     if u < 0 or u > 1 then
@@ -73,7 +74,7 @@ local function triangleRay(
     end
 
     local q1,q2,q3 = vectorCrossProduct(s1,s2,s3, e11,e12,e13)
-    local v = vectorDotProduct(dir_x,dir_y,dir_z, q1,q2,q3) / a
+    local v = vectorDotProduct(dir_x,dir_y,dir_z, q1,q2,q3) * i_a
 
     -- ray does not intersect triangle
     if v < 0 or u + v > 1 then
@@ -82,7 +83,7 @@ local function triangleRay(
 
     -- at this stage we can compute t to find out where
     -- the intersection point is on the line
-    local thisLength = vectorDotProduct(q1,q2,q3, e21,e22,e23) / a
+    local thisLength = vectorDotProduct(q1,q2,q3, e21,e22,e23) * i_a
 
     -- if hit this triangle and it's closer than any other hit triangle
     if thisLength >= tiny and (not finalLength or thisLength < finalLength) then
