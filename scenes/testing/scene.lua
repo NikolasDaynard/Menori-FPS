@@ -1,13 +1,6 @@
--- Basic lighting Menori Example
---[[
--------------------------------------------------------------------------------
-	Menori
-	@author rozenmad
-	2023
--------------------------------------------------------------------------------
-]]
-
 local menori = require 'menori'
+require("player")
+require("helpers")
 
 local ml = menori.ml
 local vec3 = ml.vec3
@@ -34,7 +27,7 @@ function scene:init()
 	scene.super.init(self)
 
 	local _, _, w, h = menori.app:get_viewport()
-	self.camera = menori.PerspectiveCamera(60, w/h, 0.5, 1024)
+	self.camera = menori.PerspectiveCamera(60, w / h, 0.5, 1024)
 	self.environment = menori.Environment(self.camera)
 
 	-- adding light sources
@@ -73,9 +66,7 @@ function scene:init()
 
 	self.root_node:attach(scenes[1])
 
-	self.x_angle = 0
-	self.y_angle = -30
-	self.view_scale = 10
+	self.view_scale = 0.1
 end
 
 function scene:render()
@@ -89,8 +80,8 @@ function scene:render()
 end
 
 function scene:update_camera()
-	local q = quat.from_euler_angles(0, math.rad(self.x_angle), math.rad(self.y_angle)) * vec3.unit_z * self.view_scale
-	local v = vec3(0, 0.5, 0)
+	local q = quat.from_euler_angles(0, math.rad(player:getXAngle()), math.rad(player:getYAngle())) * vec3.unit_z * self.view_scale
+	local v = player:getPosition()
 	self.camera.center = v
 	self.camera.eye = q + v
 	self.camera:update_view_matrix()
@@ -100,20 +91,24 @@ end
 
 -- camera control
 function scene:mousemoved(x, y, dx, dy)
-	if love.mouse.isDown(2) then
-		self.y_angle = self.y_angle - dy * 0.2
-		self.x_angle = self.x_angle - dx * 0.2
-		self.y_angle = ml_utils.clamp(self.y_angle, -45, 45)
-	end
+	-- if love.mouse.isDown(2) then
+	-- 	self.y_angle = self.y_angle - dy * 0.2
+	-- 	self.x_angle = self.x_angle - dx * 0.2
+	-- 	self.y_angle = ml_utils.clamp(self.y_angle, -45, 45)
+	-- end
+	player:updateCam(dx, dy)
+	local _, _, w, h = menori.app:get_viewport()
+	wrapCursor(w, h)
 end
 
 function scene:wheelmoved(x, y)
 	self.view_scale = self.view_scale - y * 0.2
 end
 
-function scene:update()
+function scene:update(dt)
 	self:update_camera()
 	self:update_nodes(self.root_node, self.environment)
+	player:update(dt)
 end
 
 return scene

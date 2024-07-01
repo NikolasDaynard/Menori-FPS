@@ -12,10 +12,6 @@ for _, v in ipairs(example_list) do
 end
 menori.app:set_scene('testing')
 
-function love.init()
-	menori.PerspectiveCamera:init (90, 16/9, .1, 50)
-end
-
 function love.draw()
 	menori.app:render()
 
