@@ -113,8 +113,8 @@ function Player:update(dt)
     gun:update(dt)
     -- collect inputs
     local moveX, moveY = 0, 0
-    local speed = .05
-    local friction = 0.94
+    local speed = .02
+    local friction = 0.87
     local gravity = 0.02
     local jump = .5
     local maxFallSpeed = 3
@@ -160,8 +160,8 @@ function Player:update(dt)
     
                     local vector = {self.position.x - x, self.position.z - z}
                     local vectorX, _, vectorZ = vectors.normalize(vector[1], 0, vector[2])
-                    self.speed.x = self.speed.x + vectorX
-                    self.speed.z = self.speed.z + vectorZ
+                    self.speed.x = self.speed.x + vectorX / 3 -- walljumo pushoff
+                    self.speed.z = self.speed.z + vectorZ / 3
                     break
                 end
             end
@@ -232,7 +232,15 @@ function Player:update(dt)
     end
 
     -- wall movement and collision check
-    self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
+    self.speed.x = self.speed.x / 5
+    self.speed.z = self.speed.z / 5
+    for i = 1, 5 do
+        self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
+        self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
+        self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
+    end
+    self.speed.x = self.speed.x * 5
+    self.speed.z = self.speed.z * 5
     
     g3d.camera.position[1] = self.position.x
     g3d.camera.position[2] = self.position.y - .5 * self.height
