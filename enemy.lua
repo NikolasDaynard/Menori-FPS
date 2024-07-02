@@ -102,11 +102,22 @@ function enemy:update(dt)
 
     local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
     local vectorX, vectorY, vectorZ = vectorToPlayer.x, vectorToPlayer.y, vectorToPlayer.z
+    -- self.speed.x = ((((vectorX) / 1 * dt) * 10) / math.abs(vectorToPlayer.x))
+    -- self.position.y = self.position.y - vectorY / 1 * dt
+    -- self.speed.z = ((((vectorZ) / 1 * dt) * 10) / math.abs(vectorToPlayer.z))
+
+    -- _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
+    -- _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
+    -- _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
 
     print(self.speed.z)
     self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(-self.speed.x, 0, -self.speed.z)
+    -- print(self.speed.y)
+
 
     self.model:setTranslation(self.position.x, self.position.y, self.position.z)
+
+    -- print(self.health)
 
     if self.health <= 0 then
         self = nil
