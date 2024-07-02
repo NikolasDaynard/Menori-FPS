@@ -17,7 +17,10 @@ function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVector
     angle = math.atan2(cameraLookVectorZ, cameraLookVectorX)
     translationX = math.cos(angle) / 2
     translationZ = math.sin(angle) / 2
-    particles:addParticle(playerX, playerY - .3, playerZ, translationX, 0, translationZ)
+    for i = 1, 30 do
+        local rand = math.random()
+        -- particles:addParticle(playerX, playerY - .3, playerZ, translationX + math.cos(rand) / 10, math.cos(math.random()) / 10, translationZ + math.sin(rand) / 10)
+    end
 
     collisionModels = entityHolder:getEntities()
     local intersection = {}

@@ -30,7 +30,7 @@ function particles:update(dt)
 
             particle.t = dt -- time 
             particle.particleModel:setTranslation(x, y, z)
-            particle.particleModel:setScale(30, 30, 2)
+            particle.particleModel:setScale(1, 1, 1)
         end
     end
 end

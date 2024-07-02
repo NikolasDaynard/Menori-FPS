@@ -234,7 +234,7 @@ function Player:update(dt)
     -- wall movement and collision check
     self.speed.x = self.speed.x / 5
     self.speed.z = self.speed.z / 5
-    for i = 1, 5 do
+    for _ = 1, 5 do
         self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
         self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
         self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
