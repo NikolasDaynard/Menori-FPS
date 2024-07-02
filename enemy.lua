@@ -107,8 +107,8 @@ function enemy:update(dt)
 
     self.position.x = self.position.x - self.speed.x
     self.position.z = self.position.z - self.speed.z
-    print(self.speed.y)
-    print(self.speed.y)
+    -- print(self.speed.y)
+    -- print(self.speed.y)
     -- _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
     -- if self.speed.y > 0 and self:collisionTest(0.5, -.1, 0.5, .1) then
     --     -- print("clip")
@@ -116,7 +116,7 @@ function enemy:update(dt)
     --     self.speed.y = 0
     -- end
     -- self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
-    print(self.speed.y)
+    -- print(self.speed.y)
 
 
     self.model:setTranslation(self.position.x, self.position.y, self.position.z)

@@ -9,6 +9,7 @@ local vectors = require "g3d/vectors"
 local primitives = require "primitives"
 
 require("enemy")
+require("particles")
 
 local map, background
 player = {}
@@ -50,6 +51,7 @@ function love.update(dt)
         player:update(dt)
     end
     entityHolder:updateEntities(dt)
+    particles:update(dt)
 
     -- interpolate player between frames
     -- to stop camera jitter when fps and timestep do not match
@@ -92,6 +94,7 @@ function love.draw()
     background:draw()
     player:render()
     entityHolder:renderEntities()
+    particles:render()
 
     drawTree(1,0.5,0)
     drawTree(0,0.5,1.5)

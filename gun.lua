@@ -1,5 +1,7 @@
 local g3d = require "g3d"
 local collisions = require "g3d/collisions"
+require("particles")
+
 gun = {
     currentTime = 0,
     firerate = 1
@@ -12,6 +14,10 @@ function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVector
         return
     end
     self.currentTime = 0
+    angle = math.atan2(cameraLookVectorZ, cameraLookVectorX)
+    translationX = math.cos(angle) / 2
+    translationZ = math.sin(angle) / 2
+    particles:addParticle(playerX, playerY - .3, playerZ, translationX, 0, translationZ)
 
     collisionModels = entityHolder:getEntities()
     local intersection = {}
