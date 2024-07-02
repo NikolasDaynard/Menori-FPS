@@ -7,6 +7,7 @@ local g3d = require "g3d"
 local Player = require "player"
 local vectors = require "g3d/vectors"
 local primitives = require "primitives"
+require("cpml")
 
 require("enemy")
 require("particles")
@@ -104,6 +105,11 @@ function love.draw()
 
     lg.setCanvas()
     lg.draw(canvas[1], 1024/2, 576/2, 0, 1,-1, 1024/2, 576/2)
+    windowWidth, windowHeight = love.window.getMode()
+    love.graphics.rectangle("fill", windowWidth - (windowWidth * .8), windowHeight - (windowHeight / 6), windowWidth * .6, windowHeight / 10)
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.rectangle("fill", windowWidth - (windowWidth * .79), windowHeight - (windowHeight / 6.5), windowWidth * .58 * enemy.health / enemy.maxHealth, windowHeight / 12)
+    love.graphics.setColor(1, 1, 1)
     love.graphics.print("Current FPS: " .. tostring(love.timer.getFPS()), 10, 10)
 
     --lg.print(collectgarbage("count"))

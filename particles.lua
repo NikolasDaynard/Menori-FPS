@@ -15,7 +15,10 @@ function particles:addParticle(particleX, particleY, particleZ, particleDX, part
     local particleModel = g3d.newModel("assets/particle.obj", "assets/gradient.jpeg", {particleX, particleY, particleZ}, {0, 0, 0}, {-1,-1,1})
     
     updateCallback = updateCallback or function(x, y, z, dx, dy, dz, t)
-        print(dx)
+        -- print(dx)
+        if t > 0 then
+            return nil
+        end
         return x + dx, y + dy, z + dz, dx, dy, dz
     end
     table.insert(self.particles, {x = particleX, y = particleY, z = particleZ, dx = particleDX, dy = particleDY, dz = particleDZ, t = 0, updateCallback = updateCallback, particleModel = particleModel}) 
@@ -25,12 +28,16 @@ function particles:update(dt)
     for _, particle in ipairs(self.particles) do
         if particle.updateCallback then -- updateCallback
             local x, y, z, dx, dy, dz, colR, colG, colB = particle.updateCallback(particle.x, particle.y, particle.z, particle.dx, particle.dy, particle.dz, particle.t)
-            particle.x, particle.y, particle.z = x, y, z
-            particle.dx, particle.dy, particle.dz = dx, dy, dz
+            if x then
+                particle.x, particle.y, particle.z = x, y, z
+                particle.dx, particle.dy, particle.dz = dx, dy, dz
 
-            particle.t = dt -- time 
-            particle.particleModel:setTranslation(x, y, z)
-            particle.particleModel:setScale(1, 1, 1)
+                particle.t = dt -- time 
+                particle.particleModel:setTranslation(x, y, z)
+                particle.particleModel:setScale(1, 1, 1)
+            else
+                particle = nil
+            end
         end
     end
 end

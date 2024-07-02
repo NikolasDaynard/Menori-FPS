@@ -4,16 +4,12 @@ require("particles")
 
 gun = {
     currentTime = 0,
-    firerate = 1
+    firerate = 1,
 }
 local gunMesh = g3d.newModel("assets/shockGun.obj", "assets/tileset.png", nil, nil, {-1, -1, 1})
 local hitMesh = g3d.newModel("assets/icoSphere.obj", "assets/tileset.png", nil, nil, {-1, -1, 1})
 
 function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVectorY, cameraLookVectorZ, collisionModels)
-    if self.currentTime < self.firerate then
-        return
-    end
-    self.currentTime = 0
     angle = math.atan2(cameraLookVectorZ, cameraLookVectorX)
     translationX = math.cos(angle) / 2
     translationZ = math.sin(angle) / 2
@@ -36,8 +32,13 @@ function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVector
     if hitModel then
         hitMesh:setTranslation(intersection.x, intersection.y, intersection.z)
         local entity = entityHolder:getEntityFromModel(hitModel)
-        if entity.health then
-            entity.health = entity.health - 1
+        if self.currentTime > self.firerate then
+            self.currentTime = 0
+            if entity.health then
+                local rand = math.random()
+                particles:addParticle(intersection.x, intersection.y, intersection.z, translationX + math.cos(rand) / 10, math.cos(math.random()) / 10, translationZ + math.sin(rand) / 10)
+                entity.health = entity.health - 1
+            end
         end
     end
 end

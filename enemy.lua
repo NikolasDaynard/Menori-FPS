@@ -1,11 +1,14 @@
 local g3d = require "g3d"
+local iqm = require "iqm-exm"
 local vectors = require "g3d/vectors"
 require("entities")
 -- local Player = require("player")
 
 enemy = {
     model = g3d.newModel("assets/shopkeep.obj", "assets/gradient.jpeg", {.1,-3,.1}, {0, 0, 0}, {-1,-1,1}),
-    health = 1,
+    -- model = iqm:load("assets/tazer.iqm"),
+    health = 10,
+    maxHealth = 10,
     position = {x = 0, y = -3, z = 20},
     speed = {x = 0, y = 0, z = 0},
     lastSpeed = {x = 0, y = 0, z = 0},
@@ -110,7 +113,7 @@ function enemy:update(dt)
     -- _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
     -- _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
 
-    print(self.speed.z)
+    -- print(self.speed.z)
     self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(-self.speed.x, 0, -self.speed.z)
     -- print(self.speed.y)
 
