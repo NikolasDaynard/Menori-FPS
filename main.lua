@@ -111,6 +111,10 @@ function love.keypressed(k)
                 player.doubleTapTimer.key = k
             end
         end
+    else
+        player.doubleTapTimer.key = ""
+        player.doubleTapTimer.time = 0
+        player.doubleTapTimer.taps = 0
     end
 end
 

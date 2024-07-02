@@ -2,30 +2,7 @@ local g3d = require "g3d"
 -- local camera = require "g3d/camera"
 local collisions = require "g3d/collisions"
 require("particles")
-local nshader = love.graphics.newShader [[
-    uniform mat4 projectionMatrix;
-    uniform mat4 modelMatrix;
-    uniform mat4 viewMatrix;
-
-    varying vec4 vertexColor;
-
-    #ifdef VERTEX
-        vec4 position(mat4 transform_projection, vec4 vertex_position)
-        {
-            vertexColor = VertexColor;
-            return projectionMatrix * viewMatrix * modelMatrix * vertex_position;
-        }
-    #endif
-
-    #ifdef PIXEL
-        vec4 effect(vec4 color, Image tex, vec2 texcoord, vec2 pixcoord)
-        {
-            vec4 texcolor = Texel(tex, vec2(texcoord.x, 1-texcoord.y));
-            if (texcolor.a == 0.0) { discard; }
-            return vec4(texcolor)*color*vertexColor;
-        }
-    #endif
-]]
+local nshader = love.graphics.newShader("shaders/lighting.vert", "shaders/lighting.frag")
 
 gun = {
     currentTime = 0,
@@ -77,7 +54,10 @@ function gun:render()
     gunMesh:updateMatrix()
     g3d.camera.projectionMatrix:setProjectionMatrix(g3d.camera.fov, g3d.camera.nearClip, g3d.camera.farClip, g3d.camera.aspectRatio);
     nshader:send("projectionMatrix", g3d.camera.projectionMatrix)
-    g3d.camera:updateViewMatrix(nshader)
+
+    g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
+    nshader:send("viewMatrix", g3d.camera.viewMatrix)
+
     gunMesh:draw(nshader)
     hitMesh:draw()
 end
