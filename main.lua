@@ -1,4 +1,5 @@
 io.stdout:setvbuf("no")
+nshader = love.graphics.newShader("shaders/lighting.vert", "shaders/lighting.frag")
 
 local lg = love.graphics
 lg.setDefaultFilter("linear")
@@ -141,11 +142,19 @@ local function drawTree(x,y,z)
 end
 
 function love.draw()
+    g3d.camera.projectionMatrix:setProjectionMatrix(g3d.camera.fov, g3d.camera.nearClip, g3d.camera.farClip, g3d.camera.aspectRatio);
+    nshader:send("projectionMatrix", g3d.camera.projectionMatrix)
+
+    g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
+    nshader:send("viewMatrix", g3d.camera.viewMatrix)
+
+    g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
+    nshader:send("lights", {0, 0, 0, .1}, {0, 20, 30, .1})
+
     lg.setCanvas(canvas)
     lg.clear(0,0,0,0)
 
     --lg.setDepthMode("lequal", true)
-    map:draw()
     background:draw()
     player:render()
     entityHolder:renderEntities()

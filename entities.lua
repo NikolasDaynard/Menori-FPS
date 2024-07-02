@@ -18,9 +18,10 @@ end
 function entityHolder:renderEntities()
     for k, v in pairs(self.entities) do
         if v.render then
-            v:render()
+            v:render(nshader)
         else
-            v.model:draw()
+            v.model:updateMatrix()
+            v.model:draw(nshader)
         end
     end
 end

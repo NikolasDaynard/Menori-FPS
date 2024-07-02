@@ -2,13 +2,12 @@ local g3d = require "g3d"
 -- local camera = require "g3d/camera"
 local collisions = require "g3d/collisions"
 require("particles")
-local nshader = love.graphics.newShader("shaders/lighting.vert", "shaders/lighting.frag")
 
 gun = {
     currentTime = 0,
     firerate = 1,
 }
-local gunMesh = g3d.newModel("assets/shockGun.obj", "assets/tileset.png", nil, nil, {-1, -1, 1})
+local gunMesh = g3d.newModel("assets/shockGun.obj", "assets/rust.png", nil, nil, {-1, -1, 1})
 local hitMesh = g3d.newModel("assets/icoSphere.obj", "assets/tileset.png", nil, nil, {-1, -1, 1})
 
 function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVectorY, cameraLookVectorZ, collisionModels)
@@ -52,11 +51,6 @@ end
 
 function gun:render()
     gunMesh:updateMatrix()
-    g3d.camera.projectionMatrix:setProjectionMatrix(g3d.camera.fov, g3d.camera.nearClip, g3d.camera.farClip, g3d.camera.aspectRatio);
-    nshader:send("projectionMatrix", g3d.camera.projectionMatrix)
-
-    g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
-    nshader:send("viewMatrix", g3d.camera.viewMatrix)
 
     gunMesh:draw(nshader)
     hitMesh:draw()
