@@ -12,6 +12,7 @@ local primitives = require "primitives"
 
 require("enemy")
 require("particles")
+require("titlescreen")
 
 local map, background
 player = {}
@@ -38,6 +39,7 @@ function love.load()
 end
 
 function love.update(dt)
+    titlescreen:update()
     -- rolling average so that abrupt changes in dt
     -- do not affect gameplay
     -- the math works out (div by 60, then mult by 60)
@@ -149,7 +151,7 @@ function love.draw()
     nshader:send("viewMatrix", g3d.camera.viewMatrix)
 
     g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
-    nshader:send("lights", {0, 0, 0, .1}, {0, 20, 30, .1})
+    nshader:send("lights", {0, 0, 0, 1}, {0, 20, 30, 1})
 
     lg.setCanvas(canvas)
     lg.clear(0,0,0,0)
@@ -174,6 +176,8 @@ function love.draw()
     love.graphics.rectangle("fill", windowWidth - (windowWidth * .79), windowHeight - (windowHeight / 6.5), windowWidth * .58 * enemy.health / enemy.maxHealth, windowHeight / 12)
     love.graphics.setColor(1, 1, 1)
     love.graphics.print("Current FPS: " .. tostring(love.timer.getFPS()), 10, 10)
+
+    titlescreen:render()
 
     --lg.print(collectgarbage("count"))
 end

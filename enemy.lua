@@ -152,7 +152,9 @@ function enemy:repickState()
             self.states.tazePlayerClose = false
             self.states.zapping = false
             self.states.electrifyDist = true
-            self.states.movingTowardsPlayer = false
+
+            self.hitVis:setTranslation(player.position.x, 0, player.position.z)
+            self.states.movingTowardsPlayer = true
             self.states.charging = false
             return
         end
@@ -217,7 +219,6 @@ function enemy:update(dt)
         end
     elseif self.states.electrifyDist then
         self.hitVis:setScale(50,1,60)
-        self.hitVis:setTranslation(0, 0, 5)
         if self.timer >= 2.5 then
             if enemy:collisionTestForPlayer(0, -player.position.y, 0, 0, self.hitVis) then
                 player.health = player.health - 50

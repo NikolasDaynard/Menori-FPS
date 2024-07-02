@@ -26,7 +26,7 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
         if (texcolor.a == 0.0) { discard; }
 
         // draw the color from the texture multiplied by the light amount
-        lightness = lightness + diffuse + 0.2;
+        lightness = lightness + diffuse;
     }
-    return vec4((texcolor * color).rgb * lightness, 1.0);
+    return vec4((texcolor * color).rgb * (lightness + .2), 1.0);
 }
