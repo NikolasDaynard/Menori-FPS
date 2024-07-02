@@ -114,6 +114,10 @@ end
 
 function Player:update(dt)
     if self.health < 1 then
+        if not deathmusic:isPlaying() then
+            love.audio.stop()
+            deathmusic:play()
+        end
         return
     end
     -- print(self.health)

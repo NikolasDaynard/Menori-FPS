@@ -4,5 +4,5 @@ function love.conf(t)
     t.window.height = 576
     t.window.vsync = true
     t.window.fullscreen = false
-    t.window.title = "fps demo"
+    t.window.title = "BLAST PIT"
 end
