@@ -161,9 +161,9 @@ function Player:update(dt)
     -- apply dash impulses
     if dashForceZ then
         ---@diagnostic disable-next-line: deprecated
-        local angle = math.atan2(0,dashForceZ)
+        local angle = math.atan2(dashForceZ, 1) - (math.pi / 2)
         local direction = g3d.camera.getDirectionPitch()
-        local directionX, directionZ = math.cos(direction + angle)*0, math.sin(direction + angle + math.pi)*dashForceZ
+        local directionX, directionZ = math.cos(direction + angle)*dashForceZ, math.sin(direction + angle + math.pi)*dashForceZ
 
         self.speed.x = self.speed.x + directionX
         self.speed.z = self.speed.z + directionZ

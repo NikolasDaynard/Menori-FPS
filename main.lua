@@ -71,6 +71,7 @@ function love.keypressed(k)
         if player.doubleTapTimer.taps ~= 2 then
             if k ~= player.doubleTapTimer.key then
                 player.doubleTapTimer.time = 0
+                player.doubleTapTimer.taps = 0
             end
             player.doubleTapTimer.key = k
             player.doubleTapTimer.taps = player.doubleTapTimer.taps + 1
@@ -92,6 +93,7 @@ function love.keypressed(k)
         if player.doubleTapTimer.taps ~= 2 then
             if k ~= player.doubleTapTimer.key then
                 player.doubleTapTimer.time = 0
+                player.doubleTapTimer.taps = 0
             end
             player.doubleTapTimer.key = k
             player.doubleTapTimer.taps = player.doubleTapTimer.taps + 1
