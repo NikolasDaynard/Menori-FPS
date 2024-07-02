@@ -1,6 +1,7 @@
 local g3d = require "g3d"
 local vectors = require "g3d/vectors"
 require("gun")
+require("entities")
 
 -- TODO:
 -- on-the-fly stepDownSize calculation based on normal vector of triangle
@@ -36,6 +37,7 @@ function Player:new(x,y,z)
     self.collisionModels = {}
     self.doubleJumpCount = 1
     self.momentum = {x = 0, y = 0, z = 0}
+    self.health = 10
 
     return self
 end

@@ -1,5 +1,6 @@
 local g3d = require "g3d"
 require("helpers")
+-- local shader = love.graphics.newShader(g3d.shaderpath, "shaders/particle.glsl")
 
 -- purely the visual effect, no game logic happens here
 
@@ -16,12 +17,21 @@ function particles:addParticle(particleX, particleY, particleZ, particleDX, part
     
     updateCallback = updateCallback or function(x, y, z, dx, dy, dz, t)
         -- print(dx)
-        if t > 0 then
+        if t > 10 then
             return nil
         end
         return x + dx, y + dy, z + dz, dx, dy, dz
     end
     table.insert(self.particles, {x = particleX, y = particleY, z = particleZ, dx = particleDX, dy = particleDY, dz = particleDZ, t = 0, updateCallback = updateCallback, particleModel = particleModel}) 
+end
+
+function particles:removeParticle(particleToRemove)
+    for i, particle in ipairs(self.particles) do
+        if particle == particleToRemove then
+            table.remove(self.particles, i)
+            return
+        end
+    end
 end
 
 function particles:update(dt)
@@ -36,6 +46,9 @@ function particles:update(dt)
                 particle.particleModel:setTranslation(x, y, z)
                 particle.particleModel:setScale(1, 1, 1)
             else
+                particles:removeParticle(particle)
+                particle.particleModel = nil
+                particle.updateCallback = nil
                 particle = nil
             end
         end

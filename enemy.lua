@@ -15,6 +15,17 @@ enemy = {
     normal = {x = 0, y = 1, z = 0},
     radius = .5,
     height = 1,
+    timer = 0,
+}
+
+enemy.states = {
+    idle = true,
+    zapping = false,
+    charging = false,
+    protected = false,
+    movingTowardsPlayer = false,
+    electrifyDist = false,
+    waves = false,
 }
 
 function enemy:moveAndSlide(mx,my,mz)
@@ -81,6 +92,34 @@ function enemy:collisionTest(mx, my, mz, rad)
 
     return bestLength, bx,by,bz, bnx,bny,bnz
 end
+function enemy:collisionTestForPlayer(mx, my, mz, rad)
+    rad = rad or .2
+    local bestLength
+    local model
+
+    collisionModels = entityHolder:getEntities()
+    for _,entity in pairs(collisionModels) do
+        if not entity.model then 
+            return entity
+        end
+        local len, x,y,z, nx,ny,nz = entity.model:capsuleIntersection(
+            self.position.x + mx,
+            self.position.y + my - 0.15 * self.height,
+            self.position.z + mz,
+            self.position.x + mx,
+            self.position.y + my + 0.5 * self.height,
+            self.position.z + mz,
+            0.2
+        )
+
+        if len and (not bestLength or len < bestLength) then
+            bestLength = len
+            model = entity.model
+        end
+    end
+
+    return model
+end
 
 entityHolder:addEntity(enemy, 8)
 
@@ -94,6 +133,7 @@ end
 
 -- boss doesn't move a lot 
 function enemy:update(dt)
+    self.timer = self.timer + dt
     -- entityHolder:addEntity(enemy, 8)
     -- print(player:getPosition())
     local friction = .8
@@ -102,23 +142,32 @@ function enemy:update(dt)
     self.speed.y = 0 --math.min(self.speed.y + .7, maxFallSpeed)
     self.speed.x = self.speed.x * friction
     self.speed.z = self.speed.z * friction
-
     local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
-    local vectorX, vectorY, vectorZ = vectorToPlayer.x, vectorToPlayer.y, vectorToPlayer.z
-    -- self.speed.x = ((((vectorX) / 1 * dt) * 10) / math.abs(vectorToPlayer.x))
-    -- self.position.y = self.position.y - vectorY / 1 * dt
-    -- self.speed.z = ((((vectorZ) / 1 * dt) * 10) / math.abs(vectorToPlayer.z))
 
-    -- _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
-    -- _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
-    -- _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
+    if vectorToPlayer.x + vectorToPlayer.z < .2 then
+        self.states.movingTowardsPlayer = true
+    end
 
-    -- print(self.speed.z)
-    self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(-self.speed.x, 0, -self.speed.z)
-    -- print(self.speed.y)
+    if self.states.movingTowardsPlayer then
+        local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
+        local vectorX, vectorY, vectorZ = vectorToPlayer.x, vectorToPlayer.y, vectorToPlayer.z
+        self.speed.x = ((((vectorX) / 1 * dt) * 10) / math.abs(vectorToPlayer.x))
+        -- self.position.y = self.position.y - vectorY / 1 * dt
+        self.speed.z = ((((vectorZ) / 1 * dt) * 10) / math.abs(vectorToPlayer.z))
+
+        _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
+        _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
+        _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
+        self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(-self.speed.x, 0, -self.speed.z)
+    end
 
 
     self.model:setTranslation(self.position.x, self.position.y, self.position.z)
+
+
+    if (enemy:collisionTestForEntity(0, 0, 0, 0)) == player then
+        print("plater")
+    end
 
     -- print(self.health)
 
