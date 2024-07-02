@@ -37,7 +37,7 @@ function Player:new(x,y,z)
     self.collisionModels = {}
     self.doubleJumpCount = 1
     self.momentum = {x = 0, y = 0, z = 0}
-    self.health = 10
+    self.health = 70 -- frames of dmg
 
     return self
 end
@@ -112,6 +112,10 @@ function Player:moveAndSlide(mx,my,mz)
 end
 
 function Player:update(dt)
+    if self.health < 1 then
+        return
+    end
+    print(self.health)
     gun:update(dt)
     -- collect inputs
     local moveX, moveY = 0, 0
@@ -238,9 +242,11 @@ function Player:update(dt)
     self.speed.x = self.speed.x / 5
     self.speed.z = self.speed.z / 5
     for _ = 1, 5 do
-        self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
-        self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
-        self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
+        self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x * 3, 0, self.speed.z * 3)
+        self.speed.x = self.speed.x / 3
+        self.speed.z = self.speed.z / 3
+        -- self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
+        -- self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(self.speed.x, 0, self.speed.z)
     end
     self.speed.x = self.speed.x * 5
     self.speed.z = self.speed.z * 5

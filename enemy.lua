@@ -98,23 +98,19 @@ end
 function enemy:collisionTestForPlayer(mx, my, mz, rad, checkModel)
     rad = rad or .2
     local bestLength
-    local model
 
-    collisionModels = entityHolder:getEntities()
-    for _,entity in pairs(collisionModels) do
-        local len, x,y,z, nx,ny,nz = entity.model:capsuleIntersection(
-            player.position.x + mx,
-            player.position.y + my - 0.15 * player.height,
-            player.position.z + mz,
-            player.position.x + mx,
-            player.position.y + my + 0.5 * player.height,
-            player.position.z + mz,
-            0.2
-        )
+    local len, x,y,z, nx,ny,nz = checkModel:capsuleIntersection(
+        player.position.x + mx,
+        player.position.y + my - 0.15 * player.height,
+        player.position.z + mz,
+        player.position.x + mx,
+        player.position.y + my + 0.5 * player.height,
+        player.position.z + mz,
+        0.2
+    )
 
-        if checkModel == entity.model and len then
-            return entity
-        end
+    if len then
+        return true
     end
 
     return nil
@@ -134,6 +130,7 @@ function enemy:repickState()
 
     if vectorToPlayer.x + vectorToPlayer.z < .2 then
         self.states.tazePlayerClose = true
+        self.states.movingTowardsPlayer = true
         self.states.idle = false
     end
     if not self.states.idle then
@@ -141,11 +138,13 @@ function enemy:repickState()
             self.states.tazePlayerClose = false
             self.states.zapping = false
             self.states.electrifyDist = true
+            self.states.movingTowardsPlayer = false
         end
-        if vectorToPlayer.z < -1 then
+        if vectorToPlayer.y > 4 then
             self.states.tazePlayerClose = false
             self.states.electrifyDist = false
             self.states.zapping = true -- for when camping on the shelves
+            self.states.movingTowardsPlayer = false
         end
     end
 end
@@ -153,6 +152,7 @@ end
 -- boss doesn't move a lot 
 function enemy:update(dt)
     if self.states.idle then
+        self.health = 30
         enemy:repickState()
     end
     self.timer = self.timer + dt
@@ -163,7 +163,9 @@ function enemy:update(dt)
 
     self.speed.y = 0 --math.min(self.speed.y + .7, maxFallSpeed)
     self.speed.x = self.speed.x * friction
+
     self.speed.z = self.speed.z * friction
+    local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
 
     if self.states.movingTowardsPlayer then
         local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
@@ -172,13 +174,19 @@ function enemy:update(dt)
         -- self.position.y = self.position.y - vectorY / 1 * dt
         self.speed.z = ((((vectorZ) / 1 * dt) * 10) / math.abs(vectorToPlayer.z))
 
-        _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
-        _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
-        _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
-        self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(-self.speed.x, 0, -self.speed.z)
+        self.speed.x = self.speed.x / 2
+        self.speed.z = self.speed.z / 2
+
+        -- self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(-self.speed.x, 0, -self.speed.z)
+        self.speed.x = self.speed.x * 2
+        self.speed.z = self.speed.z * 2
     end
     if self.states.tazePlayerClose then
-        print(self.timer)
+        self.hitVis:setScale(1,1,1)
+        if enemy:collisionTestForPlayer(0, -player.position.y, 0, 0, self.hitVis) then
+            player.health = player.health - 20
+        end
+        -- print(self.timer)
         if self.timer >= 5 then
             self.timer = 0
             self.hitVis:setScale(10,10,10)
@@ -186,11 +194,14 @@ function enemy:update(dt)
         end
     end
     if self.states.electrifyDist then
-        self.hitVis:setScale(20,1,30)
-        self.hitVis:setTranslation(0, 0, 10)
+        self.hitVis:setScale(40,1,50)
+        self.hitVis:setTranslation(0, 0, 5)
         if self.timer >= 5 then
+            if enemy:collisionTestForPlayer(0, -player.position.y, 0, 0, self.hitVis) then
+                player.health = player.health - 50
+            end
+            self.hitVis:setScale(40,100,50)
             self.timer = 0
-            self.hitVis:setScale(20,100,30)
             enemy:repickState()
         end
     end
@@ -199,13 +210,15 @@ function enemy:update(dt)
         local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
         self.model:setRotation(0, -math.atan2(vectorToPlayer.z, vectorToPlayer.x), 0)
         self.hitVis:setScale(1,1,1)
-        -- print(self.hitVis.translation)
         local step = .1
-        print(self.hitVis.translation[1])
         
         self.hitVis:setTranslation(lerp(self.hitVis.translation[1], player:getPosition().x, step), 
-            lerp(self.hitVis.translation[2], player:getPosition().y, step), 
+            lerp(self.hitVis.translation[2], player:getPosition().y, step),
             lerp(self.hitVis.translation[3], player:getPosition().z, step))
+
+        if enemy:collisionTestForPlayer(0, 0, 0, 0, self.hitVis) then
+            player.health = player.health - 1
+        end
         if self.timer >= 5 then
             self.timer = 0
             self.hitVis:setScale(20,100,30)
