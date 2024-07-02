@@ -36,7 +36,7 @@ function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVector
             self.currentTime = 0
             if entity.health then
                 local rand = math.random()
-                particles:addParticle(intersection.x, intersection.y, intersection.z, translationX + math.cos(rand) / 10, math.cos(math.random()) / 10, translationZ + math.sin(rand) / 10)
+                particles:addParticle(intersection.x, intersection.y, intersection.z, translationX + math.cos(rand) / 10, math.cos(math.random()) / 10 - .05, translationZ + math.sin(rand) / 10)
                 entity.health = entity.health - 1
             end
         end

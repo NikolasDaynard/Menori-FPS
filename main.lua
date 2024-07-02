@@ -19,6 +19,9 @@ local accumulator = 0
 local frametime = 1/60
 local rollingAverage = {}
 
+music = love.audio.newSource("audio/Battle Theme.mp3", "stream")
+music:play()
+
 function love.load()
     lg.setBackgroundColor(0.25,0.5,1)
 

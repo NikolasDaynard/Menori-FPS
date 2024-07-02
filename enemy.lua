@@ -6,10 +6,12 @@ require("entities")
 
 enemy = {
     model = g3d.newModel("assets/shopkeep.obj", "assets/gradient.jpeg", {.1,-3,.1}, {0, 0, 0}, {-1,-1,1}),
-    -- model = iqm:load("assets/tazer.iqm"),
-    health = 10,
-    maxHealth = 10,
-    position = {x = 0, y = -3, z = 20},
+    tazers = g3d.newModel("assets/tazer.obj", "assets/gradient.jpeg", {0, -2.2, 18.6}, {0, 0, 0}, {-1,-1,1}),
+    tazers2 = g3d.newModel("assets/tazer.obj", "assets/gradient.jpeg", {0, -2.2, 21.3}, {0, 0, 0}, {-1,-1,1}),
+    hitVis = g3d.newModel("assets/hit.obj", "assets/gradient.jpeg", {0, -2.2, 21.3}, {0, 0, 0}, {-10,-1,10}),
+    health = 30,
+    maxHealth = 30,
+    position = {x = 0, y = -2.2, z = 20},
     speed = {x = 0, y = 0, z = 0},
     lastSpeed = {x = 0, y = 0, z = 0},
     normal = {x = 0, y = 1, z = 0},
@@ -24,6 +26,7 @@ enemy.states = {
     charging = false,
     protected = false,
     movingTowardsPlayer = false,
+    tazePlayerClose = false,
     electrifyDist = false,
     waves = false,
 }
@@ -125,14 +128,30 @@ entityHolder:addEntity(enemy, 8)
 
 function enemy:render()
     self.model:draw()
+    self.tazers:draw()
+    self.tazers2:draw()
+    self.hitVis:draw()
 end
 
--- function enemy:render()
---     self.model:draw()
--- end
+function enemy:repickState()
+    local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
+
+    if vectorToPlayer.x + vectorToPlayer.z < .2 then
+        self.states.tazePlayerClose = true
+        self.states.idle = false
+    end
+    if not self.states.idle then
+        if vectorToPlayer.x + vectorToPlayer.z > 10 then
+            self.states.electrifyDist = true
+        end
+    end
+end
 
 -- boss doesn't move a lot 
 function enemy:update(dt)
+    if self.states.idle then
+        enemy:repickState()
+    end
     self.timer = self.timer + dt
     -- entityHolder:addEntity(enemy, 8)
     -- print(player:getPosition())
@@ -142,11 +161,6 @@ function enemy:update(dt)
     self.speed.y = 0 --math.min(self.speed.y + .7, maxFallSpeed)
     self.speed.x = self.speed.x * friction
     self.speed.z = self.speed.z * friction
-    local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
-
-    if vectorToPlayer.x + vectorToPlayer.z < .2 then
-        self.states.movingTowardsPlayer = true
-    end
 
     if self.states.movingTowardsPlayer then
         local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
@@ -160,14 +174,31 @@ function enemy:update(dt)
         _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
         self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(-self.speed.x, 0, -self.speed.z)
     end
+    if self.states.tazePlayerClose then
+        print(self.timer)
+        if self.timer >= 5 then
+            self.timer = 0
+            self.hitVis:setScale(10,10,10)
+            enemy:repickState()
+        end
+    end
+    if self.states.electrifyDist then
+        self.hitVis:setScale(20,1,30)
+        self.hitVis:setTranslation(0, 0, 10)
+        if self.timer >= 5 then
+            self.timer = 0
+            self.hitVis:setScale(20,100,30)
+            enemy:repickState()
+        end
+    end
 
 
     self.model:setTranslation(self.position.x, self.position.y, self.position.z)
 
 
-    if (enemy:collisionTestForEntity(0, 0, 0, 0)) == player then
-        print("plater")
-    end
+    -- if (enemy:collisionTestForEntity(0, 0, 0, 0)) == player then
+    --     print("plater")
+    -- end
 
     -- print(self.health)
 
