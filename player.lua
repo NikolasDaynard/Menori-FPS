@@ -197,10 +197,11 @@ function Player:update(dt)
 
     _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
     -- clip check
-    if self.speed.y > 0 and self:collisionTest(0.5, -.1, 0.5, .1) then
+    if self.speed.y > 0 and self:collisionTest(0, -.1, 0, .01) then
         -- print("clip")
-        self.position.y = self.position.y - math.max(self.speed.y * 2, 1)
-        self.speed.y = 0
+        print(self.speed.y * 200)
+        self.position.y = self.position.y - math.max(self.speed.y * 200 / 48, 1)
+        self.speed.y = -.01
     end
 
     -- ground check

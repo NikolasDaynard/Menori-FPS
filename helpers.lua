@@ -10,3 +10,7 @@ function deepCopy(original)
     end
     return copy
 end
+
+function lerp(a, b, t)
+    return a + (b - a) * t
+end

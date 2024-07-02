@@ -95,33 +95,29 @@ function enemy:collisionTest(mx, my, mz, rad)
 
     return bestLength, bx,by,bz, bnx,bny,bnz
 end
-function enemy:collisionTestForPlayer(mx, my, mz, rad)
+function enemy:collisionTestForPlayer(mx, my, mz, rad, checkModel)
     rad = rad or .2
     local bestLength
     local model
 
     collisionModels = entityHolder:getEntities()
     for _,entity in pairs(collisionModels) do
-        if not entity.model then 
-            return entity
-        end
         local len, x,y,z, nx,ny,nz = entity.model:capsuleIntersection(
-            self.position.x + mx,
-            self.position.y + my - 0.15 * self.height,
-            self.position.z + mz,
-            self.position.x + mx,
-            self.position.y + my + 0.5 * self.height,
-            self.position.z + mz,
+            player.position.x + mx,
+            player.position.y + my - 0.15 * player.height,
+            player.position.z + mz,
+            player.position.x + mx,
+            player.position.y + my + 0.5 * player.height,
+            player.position.z + mz,
             0.2
         )
 
-        if len and (not bestLength or len < bestLength) then
-            bestLength = len
-            model = entity.model
+        if checkModel == entity.model and len then
+            return entity
         end
     end
 
-    return model
+    return nil
 end
 
 entityHolder:addEntity(enemy, 8)
@@ -142,7 +138,14 @@ function enemy:repickState()
     end
     if not self.states.idle then
         if vectorToPlayer.x + vectorToPlayer.z > 10 then
+            self.states.tazePlayerClose = false
+            self.states.zapping = false
             self.states.electrifyDist = true
+        end
+        if vectorToPlayer.z < -1 then
+            self.states.tazePlayerClose = false
+            self.states.electrifyDist = false
+            self.states.zapping = true -- for when camping on the shelves
         end
     end
 end
@@ -185,6 +188,24 @@ function enemy:update(dt)
     if self.states.electrifyDist then
         self.hitVis:setScale(20,1,30)
         self.hitVis:setTranslation(0, 0, 10)
+        if self.timer >= 5 then
+            self.timer = 0
+            self.hitVis:setScale(20,100,30)
+            enemy:repickState()
+        end
+    end
+
+    if self.states.zapping then
+        local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
+        self.model:setRotation(0, -math.atan2(vectorToPlayer.z, vectorToPlayer.x), 0)
+        self.hitVis:setScale(1,1,1)
+        -- print(self.hitVis.translation)
+        local step = .1
+        print(self.hitVis.translation[1])
+        
+        self.hitVis:setTranslation(lerp(self.hitVis.translation[1], player:getPosition().x, step), 
+            lerp(self.hitVis.translation[2], player:getPosition().y, step), 
+            lerp(self.hitVis.translation[3], player:getPosition().z, step))
         if self.timer >= 5 then
             self.timer = 0
             self.hitVis:setScale(20,100,30)

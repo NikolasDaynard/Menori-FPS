@@ -20,6 +20,8 @@ local frametime = 1/60
 local rollingAverage = {}
 
 music = love.audio.newSource("audio/Battle Theme.mp3", "stream")
+gunAudio = love.audio.newSource("audio/tu.wav", "static")
+music:setLooping(true)
 music:play()
 
 function love.load()

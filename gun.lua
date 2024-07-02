@@ -33,6 +33,7 @@ function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVector
         hitMesh:setTranslation(intersection.x, intersection.y, intersection.z)
         local entity = entityHolder:getEntityFromModel(hitModel)
         if self.currentTime > self.firerate then
+            gunAudio:play()
             self.currentTime = 0
             if entity.health then
                 local rand = math.random()
