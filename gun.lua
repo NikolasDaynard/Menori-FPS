@@ -4,7 +4,7 @@ gun = {
     currentTime = 0,
     firerate = 1
 }
-local gunMesh = g3d.newModel("assets/gu.obj", "assets/tileset.png", nil, nil, {-1, -1, 1})
+local gunMesh = g3d.newModel("assets/shockGun.obj", "assets/tileset.png", nil, nil, {-1, -1, 1})
 local hitMesh = g3d.newModel("assets/icoSphere.obj", "assets/tileset.png", nil, nil, {-1, -1, 1})
 
 function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVectorY, cameraLookVectorZ, collisionModels)

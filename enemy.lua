@@ -34,5 +34,6 @@ function enemy:update(dt)
 
     if self.health <= 0 then
         self = nil
+        entityHolder:removeEntity(enemy, 8)
     end
 end

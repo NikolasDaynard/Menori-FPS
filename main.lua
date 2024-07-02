@@ -1,7 +1,7 @@
 io.stdout:setvbuf("no")
 
 local lg = love.graphics
-lg.setDefaultFilter("nearest")
+lg.setDefaultFilter("linear")
 
 local g3d = require "g3d"
 local Player = require "player"
@@ -20,7 +20,7 @@ local rollingAverage = {}
 function love.load()
     lg.setBackgroundColor(0.25,0.5,1)
 
-    map = g3d.newModel("assets/clean.obj", "assets/tileset.png", nil, nil, {-1,-1,1})
+    map = g3d.newModel("assets/bodyShop.obj", "assets/checker.png", nil, nil, {-1,-1,1})
     background = g3d.newModel("assets/sphere.obj", "assets/starfield.png", {0,0,0}, nil, {500,500,500})
     player = Player:new(0,0,0)
     player:addCollisionModel(map)
@@ -49,7 +49,7 @@ function love.update(dt)
         accumulator = accumulator - frametime
         player:update(dt)
     end
-    enemy:update(dt)
+    entityHolder:updateEntities(dt)
 
     -- interpolate player between frames
     -- to stop camera jitter when fps and timestep do not match
@@ -91,7 +91,7 @@ function love.draw()
     map:draw()
     background:draw()
     player:render()
-    enemy:render()
+    entityHolder:renderEntities()
 
     drawTree(1,0.5,0)
     drawTree(0,0.5,1.5)
