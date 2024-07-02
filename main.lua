@@ -22,7 +22,7 @@ local rollingAverage = {}
 music = love.audio.newSource("audio/Battle Theme.mp3", "stream")
 gunAudio = love.audio.newSource("audio/tu.wav", "static")
 music:setLooping(true)
-music:play()
+-- music:play()
 
 function love.load()
     lg.setBackgroundColor(0.25,0.5,1)
