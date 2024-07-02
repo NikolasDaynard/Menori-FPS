@@ -67,6 +67,49 @@ end
 
 function love.keypressed(k)
     if k == "escape" then love.event.push("quit") end
+    if k == "w" then
+        if player.doubleTapTimer.taps ~= 2 then
+            if k ~= player.doubleTapTimer.key then
+                player.doubleTapTimer.time = 0
+            end
+            player.doubleTapTimer.key = k
+            player.doubleTapTimer.taps = player.doubleTapTimer.taps + 1
+            print(player.doubleTapTimer.taps)
+
+            if player.doubleTapTimer.time > .6 then
+                player.doubleTapTimer.time = 0
+                player.doubleTapTimer.key = ""
+                player.doubleTapTimer.taps = 0
+            end
+
+            if player.doubleTapTimer.taps == 2 then
+                player.doubleTapTimer.taps = -1 -- player checks for taps < 0
+                player.doubleTapTimer.time = 0
+                player.doubleTapTimer.key = k
+            end
+        end
+    elseif k == "s" then
+        if player.doubleTapTimer.taps ~= 2 then
+            if k ~= player.doubleTapTimer.key then
+                player.doubleTapTimer.time = 0
+            end
+            player.doubleTapTimer.key = k
+            player.doubleTapTimer.taps = player.doubleTapTimer.taps + 1
+            print(player.doubleTapTimer.taps)
+
+            if player.doubleTapTimer.time > .6 then
+                player.doubleTapTimer.time = 0
+                player.doubleTapTimer.key = ""
+                player.doubleTapTimer.taps = 0
+            end
+
+            if player.doubleTapTimer.taps == 2 then
+                player.doubleTapTimer.taps = -1 -- player checks for taps < 0
+                player.doubleTapTimer.time = 0
+                player.doubleTapTimer.key = k
+            end
+        end
+    end
 end
 
 function love.mousemoved(x,y, dx,dy)

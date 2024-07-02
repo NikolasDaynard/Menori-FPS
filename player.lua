@@ -38,6 +38,7 @@ function Player:new(x,y,z)
     self.doubleJumpCount = 1
     self.momentum = {x = 0, y = 0, z = 0}
     self.health = 70 -- frames of dmg
+    self.doubleTapTimer = {key = "w", time = 0, taps = 0}
 
     return self
 end
@@ -124,6 +125,9 @@ function Player:update(dt)
     local gravity = 0.02
     local jump = .5
     local maxFallSpeed = 3
+    local dashForceZ = nil
+
+    self.doubleTapTimer.time = self.doubleTapTimer.time + dt
 
     -- friction
     self.speed.x = self.speed.x * friction
@@ -132,9 +136,39 @@ function Player:update(dt)
     -- gravity
     self.speed.y = math.min(self.speed.y + gravity, maxFallSpeed)
 
-    if love.keyboard.isDown("w") then moveY = moveY - 1 end
+    if love.keyboard.isDown("w") then
+        moveY = moveY - 1
+
+        if self.doubleTapTimer.taps < 0 and self.doubleTapTimer.key == "w" then
+            self.doubleTapTimer.key = ""
+            self.doubleTapTimer.time = 0
+            self.doubleTapTimer.taps = 0
+            dashForceZ = .3
+        end
+    end
     if love.keyboard.isDown("a") then moveX = moveX - 1 end
-    if love.keyboard.isDown("s") then moveY = moveY + 1 end
+
+    if love.keyboard.isDown("s") then
+        moveY = moveY + 1 
+        if self.doubleTapTimer.taps < 0 and self.doubleTapTimer.key == "s" then
+            self.doubleTapTimer.key = ""
+            self.doubleTapTimer.time = 0
+            self.doubleTapTimer.taps = 0
+            dashForceZ = -.3
+        end
+    end
+
+    -- apply dash impulses
+    if dashForceZ then
+        ---@diagnostic disable-next-line: deprecated
+        local angle = math.atan2(0,dashForceZ)
+        local direction = g3d.camera.getDirectionPitch()
+        local directionX, directionZ = math.cos(direction + angle)*0, math.sin(direction + angle + math.pi)*dashForceZ
+
+        self.speed.x = self.speed.x + directionX
+        self.speed.z = self.speed.z + directionZ
+    end
+
     if love.keyboard.isDown("d") then moveX = moveX + 1 end
 
     if love.keyboard.isDown("lshift") then

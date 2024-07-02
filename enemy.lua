@@ -129,9 +129,7 @@ end
 function enemy:repickState()
     local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
     if self.states.idle then
-        print("oidles2")
         if math.abs(vectorToPlayer.x) + math.abs(vectorToPlayer.z) < .2 then
-            print("oidles3")
             self.states.tazePlayerClose = true
             self.states.movingTowardsPlayer = true
             self.states.idle = false
@@ -173,7 +171,6 @@ end
 function enemy:update(dt)
     if self.states.idle then
         self.timer = 0
-        print("idel")
         local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
         self.health = 30
         if vectorToPlayer.x + vectorToPlayer.z < .2 then
