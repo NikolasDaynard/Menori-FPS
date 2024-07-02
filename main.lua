@@ -7,7 +7,7 @@ local g3d = require "g3d"
 local Player = require "player"
 local vectors = require "g3d/vectors"
 local primitives = require "primitives"
-require("cpml")
+-- require("cpml")
 
 require("enemy")
 require("particles")

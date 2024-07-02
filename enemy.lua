@@ -1,5 +1,5 @@
 local g3d = require "g3d"
-local iqm = require "iqm-exm"
+-- local iqm = require "iqm-exm"
 local vectors = require "g3d/vectors"
 require("entities")
 -- local Player = require("player")
@@ -8,7 +8,7 @@ enemy = {
     model = g3d.newModel("assets/shopkeep.obj", "assets/gradient.jpeg", {.1,-3,.1}, {0, 0, 0}, {-1,-1,1}),
     tazers = g3d.newModel("assets/tazer.obj", "assets/gradient.jpeg", {0, -2.2, 18.6}, {0, 0, 0}, {-1,-1,1}),
     tazers2 = g3d.newModel("assets/tazer.obj", "assets/gradient.jpeg", {0, -2.2, 21.3}, {0, 0, 0}, {-1,-1,1}),
-    hitVis = g3d.newModel("assets/hit.obj", "assets/gradient.jpeg", {0, -2.2, 21.3}, {0, 0, 0}, {-10,-1,10}),
+    hitVis = g3d.newModel("assets/hit.obj", "assets/gradient.jpeg", {0, -2.2, 21.3}, {0, 0, 0}, {-1,-1,1}),
     health = 30,
     maxHealth = 30,
     position = {x = 0, y = -2.2, z = 20},
@@ -39,6 +39,7 @@ function enemy:moveAndSlide(mx,my,mz)
     self.position.z = self.position.z + mz
 
     local ignoreSlopes = ny and ny < -0.7
+    ignoreSlopes = true
 
     if len then
         local speedLength = math.sqrt(mx^2 + my^2 + mz^2)
@@ -132,19 +133,28 @@ function enemy:repickState()
         self.states.tazePlayerClose = true
         self.states.movingTowardsPlayer = true
         self.states.idle = false
-    end
-    if not self.states.idle then
+        self.states.zapping = false
+        self.states.charging = false
+    elseif vectorToPlayer.x + vectorToPlayer.z < 10 then
+        self.states.tazePlayerClose = false
+        self.states.electrifyDist = false
+        self.states.zapping = false
+        self.states.movingTowardsPlayer = false
+        self.states.charging = true
+    elseif not self.states.idle then
         if vectorToPlayer.x + vectorToPlayer.z > 10 then
             self.states.tazePlayerClose = false
             self.states.zapping = false
             self.states.electrifyDist = true
             self.states.movingTowardsPlayer = false
+            self.states.charging = false
         end
         if vectorToPlayer.y > 4 then
             self.states.tazePlayerClose = false
             self.states.electrifyDist = false
             self.states.zapping = true -- for when camping on the shelves
             self.states.movingTowardsPlayer = false
+            self.states.charging = false
         end
     end
 end
@@ -152,8 +162,13 @@ end
 -- boss doesn't move a lot 
 function enemy:update(dt)
     if self.states.idle then
+        local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
         self.health = 30
-        enemy:repickState()
+        if vectorToPlayer.x + vectorToPlayer.z < .2 then
+            self.states.tazePlayerClose = true
+            self.states.movingTowardsPlayer = true
+        end
+        -- enemy:repickState()
     end
     self.timer = self.timer + dt
     -- entityHolder:addEntity(enemy, 8)
@@ -165,27 +180,25 @@ function enemy:update(dt)
     self.speed.x = self.speed.x * friction
 
     self.speed.z = self.speed.z * friction
-    local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
+    -- local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
 
     if self.states.movingTowardsPlayer then
         local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}
         local vectorX, vectorY, vectorZ = vectorToPlayer.x, vectorToPlayer.y, vectorToPlayer.z
-        self.speed.x = ((((vectorX) / 1 * dt) * 10) / math.abs(vectorToPlayer.x))
+
+        self.speed.x = self.speed.x + vectorX * dt
         -- self.position.y = self.position.y - vectorY / 1 * dt
-        self.speed.z = ((((vectorZ) / 1 * dt) * 10) / math.abs(vectorToPlayer.z))
+        self.speed.z = self.speed.z + vectorZ * dt
 
-        self.speed.x = self.speed.x / 2
-        self.speed.z = self.speed.z / 2
+        self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(-self.speed.x, 0, -self.speed.z)
 
-        -- self.speed.x, _, self.speed.z, nx, ny, nz = self:moveAndSlide(-self.speed.x, 0, -self.speed.z)
-        self.speed.x = self.speed.x * 2
-        self.speed.z = self.speed.z * 2
     end
     if self.states.tazePlayerClose then
-        self.hitVis:setScale(1,1,1)
         if enemy:collisionTestForPlayer(0, -player.position.y, 0, 0, self.hitVis) then
             player.health = player.health - 20
         end
+        self.hitVis:setScale(1,1,1)
+        self.hitVis:setTranslation(self.position.x, self.position.y, self.position.z)
         -- print(self.timer)
         if self.timer >= 5 then
             self.timer = 0
@@ -222,6 +235,18 @@ function enemy:update(dt)
         if self.timer >= 5 then
             self.timer = 0
             self.hitVis:setScale(20,100,30)
+            enemy:repickState()
+        end
+    end
+    if self.states.charging then
+        self.hitVis:setScale(((3) * (self.timer ^ 2)), ((1) * (self.timer ^ 2)), ((3) * (self.timer ^ 2)))
+        self.hitVis:setTranslation(self.position.x, self.position.y, self.position.z)
+        if enemy:collisionTestForPlayer(0, 0, 0, 0, self.hitVis) then
+            player.health = player.health - 5
+        end
+        if self.timer >= 5 then
+            self.hitVis:setScale(40,100,50)
+            self.timer = 0
             enemy:repickState()
         end
     end

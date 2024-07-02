@@ -115,7 +115,7 @@ function Player:update(dt)
     if self.health < 1 then
         return
     end
-    print(self.health)
+    -- print(self.health)
     gun:update(dt)
     -- collect inputs
     local moveX, moveY = 0, 0
