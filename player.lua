@@ -25,7 +25,7 @@ function Player:new(x,y,z)
     local self = setmetatable({}, Player)
     local vectorMeta = {}
 
-    self.position = {x = 0, y = 0, z = 0}
+    self.position = {x = -23.46896011086, y = 31.068234611258, z = -140.11638688191}
     self.speed = {x = 0, y = 0, z = 0}
     self.lastSpeed = {x = 0, y = 0, z = 0}
     self.normal = {x = 0, y = 1, z = 0}
@@ -113,6 +113,9 @@ function Player:moveAndSlide(mx,my,mz)
 end
 
 function Player:update(dt)
+    print("x: " .. self.position.x)
+    print("y: " .. self.position.y)
+    print("z: " .. self.position.z)
     if self.health < 1 then
         if not deathmusic:isPlaying() then
             love.audio.stop()
@@ -237,13 +240,32 @@ function Player:update(dt)
 
     -- vertical movement and collision check
 
+    self.speed.y = self.speed.y / 10
+    for i = 1, 10 do
     _, self.speed.y, _, nx, ny, nz = self:moveAndSlide(0, self.speed.y, 0)
+    end
+    self.speed.y = self.speed.y * 10
     -- clip check
     if self.speed.y > 0 and self:collisionTest(0, -.1, 0, .01) then
-        -- print("clip")
-        print(self.speed.y * 200)
-        self.position.y = self.position.y - math.max(self.speed.y * 200 / 48, 1)
-        self.speed.y = -.01
+        -- cast ray down
+        local intersection = {}
+        intersection.distance = math.huge
+        local hitModel = nil
+        for _,model in pairs(self.collisionModels) do
+            local distance, x, y, z, nx, ny, nz = model:rayIntersection(self.position.x, self.position.y + .4, self.position.z, 0, 1, 0)
+            if (distance) then
+                hitModel = model
+                break
+            end
+        end
+        if not hitModel then
+            -- print("clip")
+            print(self.speed.y * 200)
+            -- self.position.y = self.position.y - math.max(self.speed.y * 200 / 48, 1)
+            self.speed.y = self.speed.y / 2
+            self.speed.x = self.speed.x / 2
+            self.speed.z = self.speed.z / 2
+        end
     end
 
     -- ground check
@@ -304,7 +326,7 @@ function Player:interpolate(fraction)
     -- visual difference between the interpolated position and the real position
 
     g3d.camera.position[1] = self.position.x + self.speed.x*fraction
-    -- g3d.camera.position[2] = (self.position.y + self.speed.y*fraction) - .25 * self.height
+    g3d.camera.position[2] = (self.position.y + self.speed.y*fraction) - .25 * self.height
     g3d.camera.position[3] = self.position.z + self.speed.z*fraction
 
     g3d.camera.lookInDirection()

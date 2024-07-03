@@ -2,6 +2,7 @@ local g3d = require "g3d"
 -- local iqm = require "iqm-exm"
 local vectors = require "g3d/vectors"
 require("entities")
+require("credits")
 -- local Player = require("player")
 
 enemy = {
@@ -268,6 +269,7 @@ function enemy:update(dt)
     -- print(self.health)
 
     if self.health <= 0 then
+        credits.open = true
         self = nil
         entityHolder:removeEntity(enemy, 8)
     end

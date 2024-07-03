@@ -145,38 +145,40 @@ local function drawTree(x,y,z)
 end
 
 function love.draw()
-    g3d.camera.projectionMatrix:setProjectionMatrix(g3d.camera.fov, g3d.camera.nearClip, g3d.camera.farClip, g3d.camera.aspectRatio);
-    nshader:send("projectionMatrix", g3d.camera.projectionMatrix)
+    if not titlescreen.open then
+        g3d.camera.projectionMatrix:setProjectionMatrix(g3d.camera.fov, g3d.camera.nearClip, g3d.camera.farClip, g3d.camera.aspectRatio);
+        nshader:send("projectionMatrix", g3d.camera.projectionMatrix)
 
-    g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
-    nshader:send("viewMatrix", g3d.camera.viewMatrix)
+        g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
+        nshader:send("viewMatrix", g3d.camera.viewMatrix)
 
-    g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
-    nshader:send("lights", {0, 0, 0, 1}, {0, 20, 30, 1})
+        g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
+        nshader:send("lights", {0, 0, 0, 1}, {0, 20, 30, 1})
 
-    lg.setCanvas(canvas)
-    lg.clear(0,0,0,0)
+        lg.setCanvas(canvas)
+        lg.clear(0,0,0,0)
 
-    --lg.setDepthMode("lequal", true)
-    background:draw()
-    player:render()
-    entityHolder:renderEntities()
-    particles:render()
+        --lg.setDepthMode("lequal", true)
+        background:draw()
+        player:render()
+        entityHolder:renderEntities()
+        particles:render()
 
-    drawTree(1,0.5,0)
-    drawTree(0,0.5,1.5)
-    drawTree(-2,0.5,-1)
+        drawTree(1,0.5,0)
+        drawTree(0,0.5,1.5)
+        drawTree(-2,0.5,-1)
 
-    lg.setColor(1,1,1)
+        lg.setColor(1,1,1)
 
-    lg.setCanvas()
-    lg.draw(canvas[1], 1024/2, 576/2, 0, 1,-1, 1024/2, 576/2)
-    windowWidth, windowHeight = love.window.getMode()
-    love.graphics.rectangle("fill", windowWidth - (windowWidth * .8), windowHeight - (windowHeight / 6), windowWidth * .6, windowHeight / 10)
-    love.graphics.setColor(0, 0, 0)
-    love.graphics.rectangle("fill", windowWidth - (windowWidth * .79), windowHeight - (windowHeight / 6.5), windowWidth * .58 * enemy.health / enemy.maxHealth, windowHeight / 12)
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.print("Current FPS: " .. tostring(love.timer.getFPS()), 10, 10)
+        lg.setCanvas()
+        lg.draw(canvas[1], 1024/2, 576/2, 0, 1,-1, 1024/2, 576/2)
+        windowWidth, windowHeight = love.window.getMode()
+        love.graphics.rectangle("fill", windowWidth - (windowWidth * .8), windowHeight - (windowHeight / 6), windowWidth * .6, windowHeight / 10)
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.rectangle("fill", windowWidth - (windowWidth * .79), windowHeight - (windowHeight / 6.5), windowWidth * .58 * enemy.health / enemy.maxHealth, windowHeight / 12)
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.print("Current FPS: " .. tostring(love.timer.getFPS()), 10, 10)
+    end
 
     titlescreen:render()
 
