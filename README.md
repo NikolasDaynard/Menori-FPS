@@ -9,3 +9,6 @@ Visually the game is lackluster as of right now, I'm working on a new shader for
 Thank you to the poeple working on g3d, without them I could never do 3d in lua. Sending them lots of LÖVE.
 
 Please enjoy!
+
+Itch page:
+https://coding-person.itch.io/blast-pit
