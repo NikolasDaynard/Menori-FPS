@@ -28,6 +28,7 @@ gunAudio = love.audio.newSource("audio/tu.wav", "stream")
 music:setLooping(true)
 
 function love.load()
+    settings:load()
     lg.setBackgroundColor(0.25,0.5,1)
 
     map = g3d.newModel("assets/bodyShop.obj", "assets/checker.png", nil, nil, {-1,-1,1})

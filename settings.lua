@@ -67,9 +67,11 @@ end
 
 table.insert(settings.ui, {x = .4, y = .3, w = .2, h = .1, value = 1.0, text = "Volume", render = renderSlider, click = sliderClick, drag = sliderDrag, callback = function(self)
     print(self.value)
+    settings:save()
 end})
 table.insert(settings.ui, {x = .4, y = .6, w = .2, h = .1, value = 1.0, render = renderButton, click = buttonClick, callback = function(self)
     print(self.value)
+    settings:save()
 end})
 
 function settings:update()
@@ -143,11 +145,22 @@ function settings:setPosition(x, y)
     self.y = y
 end
 
+function settings:load()
+    local fileData = love.filesystem.read("settings.json")
+    local settings = lunajson.decode(fileData)
+
+    for i, ui in ipairs(self.ui) do
+        -- print(settings[i])
+        -- print(settings[i][2])
+        ui.value = (settings[i][2] or 1)
+    end
+end
+
 function settings:save()
     valuesToSave = {}
 
     for _, ui in ipairs(self.ui) do
-        table.insert(self.ui, {self.ui.y, self.ui.value})
+        table.insert(valuesToSave, self.ui.value)
     end
 
     local jsonString = lunajson.encode(valuesToSave)
