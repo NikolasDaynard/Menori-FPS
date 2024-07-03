@@ -14,6 +14,7 @@ require("enemy")
 require("particles")
 require("titlescreen")
 require("settings")
+require("audio")
 
 local map, background
 player = {}
@@ -22,13 +23,14 @@ local accumulator = 0
 local frametime = 1/60
 local rollingAverage = {}
 
-music = love.audio.newSource("audio/Battle Theme.mp3", "stream")
-deathmusic = love.audio.newSource("audio/Broke Down - Hour 4 - COMPLETED.mp3", "stream")
-gunAudio = love.audio.newSource("audio/tu.wav", "stream")
-music:setLooping(true)
+-- music = love.audio.newSource("audio/Battle Theme.mp3", "stream")
+-- deathmusic = love.audio.newSource("audio/Broke Down - Hour 4 - COMPLETED.mp3", "stream")
+-- gunAudio = love.audio.newSource("audio/tu.wav", "stream")
+-- music:setLooping(true)
 
 function love.load()
     settings:load()
+
     lg.setBackgroundColor(0.25,0.5,1)
 
     map = g3d.newModel("assets/bodyShop.obj", "assets/checker.png", nil, nil, {-1,-1,1})

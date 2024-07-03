@@ -116,11 +116,12 @@ function Player:update(dt)
     -- print("x: " .. self.position.x)
     -- print("y: " .. self.position.y)
     -- print("z: " .. self.position.z)
-    if self.health < 1 then
-        if not deathmusic:isPlaying() then
+    if self.health < 1 and self.health > -1000000 then
+        self.health = -10000000000
+        -- if not deathmusic:isPlaying() then
             love.audio.stop()
-            deathmusic:play()
-        end
+            audio:playSound("audio/Broke Down - Hour 4 - COMPLETED.mp3", true, false)
+        -- end
         return
     end
     -- print(self.health)

@@ -272,8 +272,7 @@ function enemy:update(dt)
         if not credits.open then
             credits.open = true
             love.audio.stop()
-            creditsMusic = love.audio.newSource("audio/Surpassed Hour 5.mp3", "stream")
-            creditsMusic:play()
+            audio:playSound("audio/Surpassed Hour 5.mp3", "stream", false)
         end
         self = nil
         entityHolder:removeEntity(enemy, 8)

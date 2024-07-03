@@ -1,6 +1,6 @@
-titlescreenMusic = love.audio.newSource("audio/Blast Zone - Hour 5 - COMPLETED.mp3", "stream")
-titlescreenMusic:setLooping(true)
-titlescreenMusic:play()
+require("audio")
+
+audio:playSound("audio/Blast Zone - Hour 5 - COMPLETED.mp3", true, true)
 
 titleimage = love.graphics.newImage("assets/title.png")
 
@@ -12,10 +12,7 @@ function titlescreen:update()
     if love.mouse.isDown(1) and self.open then
         self.open = false
         love.audio.stop()
-        titlescreenMusic = nil
-        gameMusicF = love.audio.newSource("audio/Battle Theme.mp3", "static")
-        gameMusicF:setLooping(true)
-        gameMusicF:play()
+        audio:playSound("audio/Battle Theme.mp3", true, true)
     end
 end
 

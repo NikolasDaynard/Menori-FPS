@@ -1,4 +1,5 @@
 lunajson = require("libs.lunajson")
+require("audio")
 
 ---@diagnostic disable: undefined-field
 settings = {
@@ -57,22 +58,26 @@ function sliderClick(self, x, y)
         return true
     end
 end
-
 function sliderDrag(self, x, y)
     local windowWidth, windowHeight = love.window.getMode()
 
     -- if x > sliderHandleX and x < sliderHandleX + sliderHandleW and y > sliderHandleY and y < sliderHandleY + sliderHandleH then
     self.value = math.min(math.max(((x) - (self.x * windowWidth)) / self.w, 0), windowWidth)
 end
-
 table.insert(settings.ui, {x = .4, y = .3, w = .2, h = .1, value = 1.0, text = "Volume", render = renderSlider, click = sliderClick, drag = sliderDrag, callback = function(self)
     print(self.value)
+    audio:setVolume(self.value)
     settings:save()
 end})
 table.insert(settings.ui, {x = .4, y = .6, w = .2, h = .1, value = 1.0, render = renderButton, click = buttonClick, callback = function(self)
     print(self.value)
     settings:save()
 end})
+
+function settings:getSettings(i)
+    return self.ui[i].value
+end
+
 
 function settings:update()
     local x, y = self.x, self.y -- didn't wanna rewrite lmao
@@ -146,13 +151,13 @@ function settings:setPosition(x, y)
 end
 
 function settings:load()
-    local fileData = love.filesystem.read("settings.json")
-    local settings = lunajson.decode(fileData)
+    if love.filesystem.getInfo("settings.json") then
+        local fileData = love.filesystem.read("settings.json")
+        local settingsArray = lunajson.decode(fileData)
 
-    for i, ui in ipairs(self.ui) do
-        -- print(settings[i])
-        -- print(settings[i][2])
-        ui.value = (settings[i][2] or 1)
+        for i, ui in ipairs(self.ui) do
+            ui.value = ((settingsArray[i] or ui.value))
+        end
     end
 end
 
@@ -160,7 +165,7 @@ function settings:save()
     valuesToSave = {}
 
     for _, ui in ipairs(self.ui) do
-        table.insert(valuesToSave, self.ui.value)
+        table.insert(valuesToSave, ui.value)
     end
 
     local jsonString = lunajson.encode(valuesToSave)
