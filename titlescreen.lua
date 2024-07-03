@@ -31,5 +31,4 @@ function titlescreen:render()
     love.graphics.draw(titleimage, windowWidth * .1, -100, 0, (1024 / windowWidth) / 4, 576 / windowHeight) 
     -- love.graphics.rectangle("fill", windowWidth * .1, 0, (windowWidth * 2) - (windowWidth * .1) * 4, windowHeight * 2)
     love.graphics.setColor(0, 0, 0)
-    love.graphics.print("foo", 100, 100)
 end 

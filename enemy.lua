@@ -269,7 +269,12 @@ function enemy:update(dt)
     -- print(self.health)
 
     if self.health <= 0 then
-        credits.open = true
+        if not credits.open then
+            credits.open = true
+            love.audio.stop()
+            creditsMusic = love.audio.newSource("audio/Surpassed Hour 5.mp3", "stream")
+            creditsMusic:play()
+        end
         self = nil
         entityHolder:removeEntity(enemy, 8)
     end

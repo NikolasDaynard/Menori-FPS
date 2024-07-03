@@ -13,6 +13,7 @@ local primitives = require "primitives"
 require("enemy")
 require("particles")
 require("titlescreen")
+require("settings")
 
 local map, background
 player = {}
@@ -25,7 +26,6 @@ music = love.audio.newSource("audio/Battle Theme.mp3", "stream")
 deathmusic = love.audio.newSource("audio/Broke Down - Hour 4 - COMPLETED.mp3", "stream")
 gunAudio = love.audio.newSource("audio/tu.wav", "stream")
 music:setLooping(true)
--- music:play()
 
 function love.load()
     lg.setBackgroundColor(0.25,0.5,1)
@@ -181,6 +181,8 @@ function love.draw()
     end
 
     titlescreen:render()
+    credits:render()
+    settings:render()
 
     --lg.print(collectgarbage("count"))
 end
