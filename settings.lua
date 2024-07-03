@@ -1,10 +1,24 @@
+---@diagnostic disable: undefined-field
 settings = {
     open = true,
     previous = false,
     ui = {},
     cursor = {x = 0, y = 0},
-    clicking = false,
+    clicking = nil, -- slider or bool
 }
+
+-- 0.0 - 1.0 range
+function renderButton(self, x, y, w, h, value)
+    local windowWidth, windowHeight = love.window.getMode()
+
+    if value then
+        love.graphics.setColor(.4, .5, .3)
+        love.graphics.rectangle("fill", x * windowWidth, y * windowHeight, w * windowWidth, h * windowHeight)
+    else
+        love.graphics.setColor(.4, .5, .3)
+        love.graphics.rectangle("fill", x * windowWidth, y * windowHeight, w * windowWidth, h * windowHeight)
+    end
+end
 
 -- 0.0 - 1.0 range
 function renderSlider(self, x, y, w, h, value)
@@ -12,32 +26,54 @@ function renderSlider(self, x, y, w, h, value)
     love.graphics.setColor(.4, .5, .3)
     love.graphics.rectangle("fill", x * windowWidth, y * windowHeight, w * windowWidth, h * windowHeight)
     love.graphics.setColor(1, 1, 1)
-    love.graphics.rectangle("fill", (x * windowWidth) - 10, (y * windowHeight) - 10, ((w * windowWidth) / 10) + 20, (h * windowHeight) + 20)
+    love.graphics.rectangle("fill", ((x * windowWidth) - 10) + (self.value * w), (y * windowHeight) - 10, ((w * windowWidth) / 10) + 20, (h * windowHeight) + 20)
 end
 
-function sliderClick(self, x, y, w, h, value)
+function sliderClick(self, x, y)
     local windowWidth, windowHeight = love.window.getMode()
-    local sliderHandleX = (x * windowWidth) - 10
-    local sliderHandleY = (y * windowHeight) - 10
-    local sliderHandleW = ((w * windowWidth) / 10) + 20
-    local sliderHandleH = (h * windowHeight) + 20
+    local sliderHandleX = ((self.x * windowWidth) - 10) + (self.value * self.w)
+    local sliderHandleY = (self.y * windowHeight) - 10
+    local sliderHandleW = ((self.w * windowWidth) / 10) + 20
+    local sliderHandleH = (self.h * windowHeight) + 20
 
     if x > sliderHandleX and x < sliderHandleX + sliderHandleW and y > sliderHandleY and y < sliderHandleY + sliderHandleH then
-        print("click")
+        return true
     end
 end
 
-table.insert(settings.ui, {x = .5, y = .3, w = .2, h = .1, value = 1.0, render = renderSlider})
+function sliderDrag(self, x, y)
+    local windowWidth, windowHeight = love.window.getMode()
+
+    -- if x > sliderHandleX and x < sliderHandleX + sliderHandleW and y > sliderHandleY and y < sliderHandleY + sliderHandleH then
+    self.value = math.min(math.max(((x) - (self.x * windowWidth)) / self.w, 0), windowWidth)
+end
+
+table.insert(settings.ui, {x = .5, y = .3, w = .2, h = .1, value = 1.0, render = renderSlider, click = sliderClick, drag = sliderDrag, callback = function(self)
+    print(self.value)
+end})
 
 function settings:click(x, y)
-    for _, ui in ipairs(self.ui) do
-        ui:click(x, y)
+    if love.mouse.isDown(1) then
+        if not self.clicking then
+            for _, ui in ipairs(self.ui) do
+                if ui:click(x, y) then
+                    self.clicking = ui
+                end
+            end
+        end
+    else
+        self.clicking = nil
+    end
+    print(self.clicking)
+    if self.clicking then
+        if self.clicking.drag then
+            self.clicking:drag(x, y)
+        end
     end
 end
 
 function settings:renderUi()
     for _, ui in ipairs(self.ui) do
-        -- print("rendering")
         ui:render(ui.x, ui.y, ui.w, ui.h, ui.value)
     end
 end

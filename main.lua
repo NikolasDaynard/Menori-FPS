@@ -130,6 +130,7 @@ function love.mousemoved(x,y, dx,dy)
     g3d.camera.firstPersonLook(dx,dy)
     if settings.open then
         settings:moveCursor(x, y)
+        settings:click(x, y)
     end
 end
 
