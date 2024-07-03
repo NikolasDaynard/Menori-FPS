@@ -3,8 +3,8 @@ Blast pit is an ultrakill inspried fps that I'm currently developing with Jayden
 
 Visually the game is lackluster as of right now, I'm working on a new shader for it but this is just what I could hack together.
 
-(screenshot)[screenshot.png]
-(GameplayDemo)[GameplayDemo.mov]
+![screenshot](screenshot.png)
+![GameplayDemo](GameplayDemo.mov)
 
 Thank you to the poeple working on g3d, without them I could never do 3d in lua. Sending them lots of LÖVE.
 
