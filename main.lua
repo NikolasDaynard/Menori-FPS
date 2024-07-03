@@ -41,7 +41,7 @@ end
 
 function love.update(dt)
     if settings.open then
-        -- settings:update()
+        settings:update()
         return
     end
     titlescreen:update()
@@ -130,7 +130,7 @@ function love.mousemoved(x,y, dx,dy)
     g3d.camera.firstPersonLook(dx,dy)
     if settings.open then
         settings:moveCursor(x, y)
-        settings:click(x, y)
+        settings:setPosition(x, y)
     end
 end
 

@@ -1,3 +1,5 @@
+lunajson = require("libs.lunajson")
+
 ---@diagnostic disable: undefined-field
 settings = {
     open = true,
@@ -15,8 +17,18 @@ function renderButton(self, x, y, w, h, value)
         love.graphics.setColor(.4, .5, .3)
         love.graphics.rectangle("fill", x * windowWidth, y * windowHeight, w * windowWidth, h * windowHeight)
     else
-        love.graphics.setColor(.4, .5, .3)
+        love.graphics.setColor(.4, 1, .3)
         love.graphics.rectangle("fill", x * windowWidth, y * windowHeight, w * windowWidth, h * windowHeight)
+    end
+end
+
+function buttonClick(self, x, y)
+    local windowWidth, windowHeight = love.window.getMode()
+
+    if x > self.x * windowWidth and x < (self.x) * windowWidth + self.w * windowWidth and y > self.y * windowHeight and y < (self.y * windowHeight) + self.h * windowHeight then
+        print("click")
+        self.value = (not self.value or false)
+        return true
     end
 end
 
@@ -27,6 +39,11 @@ function renderSlider(self, x, y, w, h, value)
     love.graphics.rectangle("fill", x * windowWidth, y * windowHeight, w * windowWidth, h * windowHeight)
     love.graphics.setColor(1, 1, 1)
     love.graphics.rectangle("fill", ((x * windowWidth) - 10) + (self.value * w), (y * windowHeight) - 10, ((w * windowWidth) / 10) + 20, (h * windowHeight) + 20)
+
+    if self.text then
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.print(self.text, x * windowWidth, (y * windowHeight) - 30)
+    end
 end
 
 function sliderClick(self, x, y)
@@ -48,26 +65,34 @@ function sliderDrag(self, x, y)
     self.value = math.min(math.max(((x) - (self.x * windowWidth)) / self.w, 0), windowWidth)
 end
 
-table.insert(settings.ui, {x = .5, y = .3, w = .2, h = .1, value = 1.0, render = renderSlider, click = sliderClick, drag = sliderDrag, callback = function(self)
+table.insert(settings.ui, {x = .4, y = .3, w = .2, h = .1, value = 1.0, text = "Volume", render = renderSlider, click = sliderClick, drag = sliderDrag, callback = function(self)
+    print(self.value)
+end})
+table.insert(settings.ui, {x = .4, y = .6, w = .2, h = .1, value = 1.0, render = renderButton, click = buttonClick, callback = function(self)
     print(self.value)
 end})
 
-function settings:click(x, y)
+function settings:update()
+    local x, y = self.x, self.y -- didn't wanna rewrite lmao
+
     if love.mouse.isDown(1) then
         if not self.clicking then
             for _, ui in ipairs(self.ui) do
+                print(ui.y)
                 if ui:click(x, y) then
                     self.clicking = ui
+                    ui:callback()
                 end
             end
         end
     else
         self.clicking = nil
     end
-    print(self.clicking)
+
     if self.clicking then
         if self.clicking.drag then
             self.clicking:drag(x, y)
+            self.clicking:callback()
         end
     end
 end
@@ -98,8 +123,6 @@ function settings:render()
     local windowWidth, windowHeight = love.window.getMode()
     love.graphics.setColor(0, 0, 0)
     love.graphics.rectangle("fill", 0, 0, windowWidth * 2, windowHeight * 2)
-    love.graphics.setColor(.4, .5, .3)
-    love.graphics.rectangle("fill", 288, 172.8, 100, 100)
 
     love.graphics.setColor(1, 1, 1)
 
@@ -114,4 +137,19 @@ function settings:onOpen()
 end
 function settings:onExit()
     love.mouse.setRelativeMode(true)
+end
+function settings:setPosition(x, y)
+    self.x = x
+    self.y = y
+end
+
+function settings:save()
+    valuesToSave = {}
+
+    for _, ui in ipairs(self.ui) do
+        table.insert(self.ui, {self.ui.y, self.ui.value})
+    end
+
+    local jsonString = lunajson.encode(valuesToSave)
+    love.filesystem.write("settings.json", jsonString)
 end
