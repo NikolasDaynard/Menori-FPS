@@ -113,9 +113,9 @@ function Player:moveAndSlide(mx,my,mz)
 end
 
 function Player:update(dt)
-    print("x: " .. self.position.x)
-    print("y: " .. self.position.y)
-    print("z: " .. self.position.z)
+    -- print("x: " .. self.position.x)
+    -- print("y: " .. self.position.y)
+    -- print("z: " .. self.position.z)
     if self.health < 1 then
         if not deathmusic:isPlaying() then
             love.audio.stop()
@@ -260,7 +260,7 @@ function Player:update(dt)
         end
         if not hitModel then
             -- print("clip")
-            print(self.speed.y * 200)
+            -- print(self.speed.y * 200)
             -- self.position.y = self.position.y - math.max(self.speed.y * 200 / 48, 1)
             self.speed.y = self.speed.y / 2
             self.speed.x = self.speed.x / 2

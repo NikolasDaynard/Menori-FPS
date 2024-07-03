@@ -40,6 +40,10 @@ function love.load()
 end
 
 function love.update(dt)
+    if settings.open then
+        -- settings:update()
+        return
+    end
     titlescreen:update()
     -- rolling average so that abrupt changes in dt
     -- do not affect gameplay
@@ -79,7 +83,7 @@ function love.keypressed(k)
             end
             player.doubleTapTimer.key = k
             player.doubleTapTimer.taps = player.doubleTapTimer.taps + 1
-            print(player.doubleTapTimer.taps)
+            -- print(player.doubleTapTimer.taps)
 
             if player.doubleTapTimer.time > .6 then
                 player.doubleTapTimer.time = 0
@@ -101,7 +105,7 @@ function love.keypressed(k)
             end
             player.doubleTapTimer.key = k
             player.doubleTapTimer.taps = player.doubleTapTimer.taps + 1
-            print(player.doubleTapTimer.taps)
+            -- print(player.doubleTapTimer.taps)
 
             if player.doubleTapTimer.time > .6 then
                 player.doubleTapTimer.time = 0
@@ -124,6 +128,9 @@ end
 
 function love.mousemoved(x,y, dx,dy)
     g3d.camera.firstPersonLook(dx,dy)
+    if settings.open then
+        settings:moveCursor(x, y)
+    end
 end
 
 local function setColor(r,g,b,a)
@@ -131,17 +138,17 @@ local function setColor(r,g,b,a)
 end
 
 local function drawTree(x,y,z)
-    setColor(56,48,46)
-    primitives.line(x,y,z, x,y-1.25,z)
-    primitives.circle(x,y,z, 0,0,0, 0.1,1,0.1)
+    -- setColor(56,48,46)
+    -- primitives.line(x,y,z, x,y-1.25,z)
+    -- primitives.circle(x,y,z, 0,0,0, 0.1,1,0.1)
 
-    setColor(71,164,61)
-    for i=1, math.pi*2, math.pi*2/3 do
-        local r = 0.35
-        --primitives.axisBillboard(1 + math.cos(i)*r, -0.5, 0 + math.sin(i)*r, 0,-1,0)
-        primitives.fullBillboard(x + math.cos(i)*r, y - 1, z + math.sin(i)*r)
-    end
-    primitives.fullBillboard(x, y-1.5, z)
+    -- setColor(71,164,61)
+    -- for i=1, math.pi*2, math.pi*2/3 do
+    --     local r = 0.35
+    --     --primitives.axisBillboard(1 + math.cos(i)*r, -0.5, 0 + math.sin(i)*r, 0,-1,0)
+    --     primitives.fullBillboard(x + math.cos(i)*r, y - 1, z + math.sin(i)*r)
+    -- end
+    -- primitives.fullBillboard(x, y-1.5, z)
 end
 
 function love.draw()
