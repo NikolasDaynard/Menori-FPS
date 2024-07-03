@@ -1,7 +1,11 @@
-# g3d_fps
-Work in progress code, not meant to really be a public-facing library right now.
+# BLAST PIT
+Blast pit is an ultrakill inspried fps that I'm currently developing with Jayden working on music. As of right now this is an early demo of the movement and general feel of the game. I haven't added any animations but the game is fully playable, you can win and there is credits.
 
-A 3D first-person controller with physics written in Lua using my [g3d](https://github.com/groverburger/g3d) 3D engine for Love2D.
-Contains many efficient collision functions, and the player uses a capsule collider which allows it to interact with walls, floors, and slopes of any angle correctly.
+Visually the game is lackluster as of right now, I'm working on a new shader for it but this is just what I could hack together.
 
-![g3d_fps1](https://user-images.githubusercontent.com/19754251/108477667-6012f900-7248-11eb-97e9-8fbc03a09a99.gif)
+(screenshot)[screenshot.png]
+(GameplayDemo)[GameplayDemo.mov]
+
+Thank you to the poeple working on g3d, without them I could never do 3d in lua. Sending them lots of LÖVE.
+
+Please enjoy!

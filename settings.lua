@@ -3,7 +3,7 @@ require("audio")
 
 ---@diagnostic disable: undefined-field
 settings = {
-    open = true,
+    open = false,
     previous = false,
     ui = {},
     cursor = {x = 0, y = 0},
@@ -20,6 +20,10 @@ function renderButton(self, x, y, w, h, value)
     else
         love.graphics.setColor(.4, 1, .3)
         love.graphics.rectangle("fill", x * windowWidth, y * windowHeight, w * windowWidth, h * windowHeight)
+    end
+    if self.text then
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.print(self.text, x * windowWidth, (y * windowHeight) - 30)
     end
 end
 
@@ -65,13 +69,18 @@ function sliderDrag(self, x, y)
     self.value = math.min(math.max(((x) - (self.x * windowWidth)) / self.w, 0), windowWidth)
 end
 table.insert(settings.ui, {x = .4, y = .3, w = .2, h = .1, value = 1.0, text = "Volume", render = renderSlider, click = sliderClick, drag = sliderDrag, callback = function(self)
-    print(self.value)
-    audio:setVolume(self.value)
+    local windowWidth, windowHeight = love.window.getMode()
+    audio:setVolume(self.value / windowWidth)
     settings:save()
 end})
-table.insert(settings.ui, {x = .4, y = .6, w = .2, h = .1, value = 1.0, render = renderButton, click = buttonClick, callback = function(self)
-    print(self.value)
+table.insert(settings.ui, {x = .4, y = .6, w = .2, h = .1, value = 1.0, text = "Return", render = renderButton, click = buttonClick, callback = function(self)
+    self.value = 1.0
     settings:save()
+    settings:onExit()
+    settings.open = false
+end})
+table.insert(settings.ui, {x = .4, y = .8, w = .2, h = .1, value = 1.0, text = "Exit Game", render = renderButton, click = buttonClick, callback = function(self)
+    love.event.push("quit")
 end})
 
 function settings:getSettings(i)
@@ -156,7 +165,7 @@ function settings:load()
         local settingsArray = lunajson.decode(fileData)
 
         for i, ui in ipairs(self.ui) do
-            ui.value = ((settingsArray[i] or ui.value))
+            ui.value = (((settingsArray or {})[i] or ui.value))
         end
     end
 end

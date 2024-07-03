@@ -23,17 +23,12 @@ local accumulator = 0
 local frametime = 1/60
 local rollingAverage = {}
 
--- music = love.audio.newSource("audio/Battle Theme.mp3", "stream")
--- deathmusic = love.audio.newSource("audio/Broke Down - Hour 4 - COMPLETED.mp3", "stream")
--- gunAudio = love.audio.newSource("audio/tu.wav", "stream")
--- music:setLooping(true)
-
 function love.load()
     settings:load()
 
     lg.setBackgroundColor(0.25,0.5,1)
 
-    map = g3d.newModel("assets/bodyShop.obj", "assets/checker.png", nil, nil, {-1,-1,1})
+    map = g3d.newModel("assets/bodyShop.obj", "assets/texture.png", nil, nil, {-1,-1,1})
     background = g3d.newModel("assets/sphere.obj", "assets/starfield.png", {0,0,0}, nil, {500,500,500})
     player = Player:new(0,0,0)
     player:addCollisionModel(map)
@@ -77,7 +72,9 @@ function love.update(dt)
 end
 
 function love.keypressed(k)
-    if k == "escape" then love.event.push("quit") end
+    if love.keyboard.isDown("escape") then
+        settings.open = not settings.open
+    end
     if k == "w" then
         if player.doubleTapTimer.taps ~= 2 then
             if k ~= player.doubleTapTimer.key then
@@ -141,20 +138,6 @@ local function setColor(r,g,b,a)
     lg.setColor(r/255, g/255, b/255, a and a/255)
 end
 
-local function drawTree(x,y,z)
-    -- setColor(56,48,46)
-    -- primitives.line(x,y,z, x,y-1.25,z)
-    -- primitives.circle(x,y,z, 0,0,0, 0.1,1,0.1)
-
-    -- setColor(71,164,61)
-    -- for i=1, math.pi*2, math.pi*2/3 do
-    --     local r = 0.35
-    --     --primitives.axisBillboard(1 + math.cos(i)*r, -0.5, 0 + math.sin(i)*r, 0,-1,0)
-    --     primitives.fullBillboard(x + math.cos(i)*r, y - 1, z + math.sin(i)*r)
-    -- end
-    -- primitives.fullBillboard(x, y-1.5, z)
-end
-
 function love.draw()
     if not titlescreen.open then
         g3d.camera.projectionMatrix:setProjectionMatrix(g3d.camera.fov, g3d.camera.nearClip, g3d.camera.farClip, g3d.camera.aspectRatio);
@@ -174,10 +157,6 @@ function love.draw()
         player:render()
         entityHolder:renderEntities()
         particles:render()
-
-        drawTree(1,0.5,0)
-        drawTree(0,0.5,1.5)
-        drawTree(-2,0.5,-1)
 
         lg.setColor(1,1,1)
 
