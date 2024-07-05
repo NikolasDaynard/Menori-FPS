@@ -22,9 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]]--
 
-local newdecoder = require 'libraries.lunajson.decoder'
-local newencoder = require 'libraries.lunajson.encoder'
-local sax = require 'libraries.lunajson.sax'
+local newdecoder = require 'libraries.decoder'
+local newencoder = require 'libraries.encoder'
+local sax = require 'libraries.sax'
 -- If you need multiple contexts of decoder and/or encoder,
 -- you can require lunajson.decoder and/or lunajson.encoder directly.
 return {
