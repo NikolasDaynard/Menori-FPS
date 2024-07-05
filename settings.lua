@@ -1,4 +1,4 @@
-lunajson = require("libs.lunajson")
+lunajson = require("libraries.lunajson")
 require("audio")
 
 ---@diagnostic disable: undefined-field
