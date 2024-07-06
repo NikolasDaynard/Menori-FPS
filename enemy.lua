@@ -7,8 +7,8 @@ require("credits")
 
 enemy = {
     model = g3d.newModel("assets/shopkeep.obj", "assets/gradient.jpeg", {.1,-3,.1}, {0, 0, 0}, {-1,-1,1}),
-    tazers = g3d.newModel("assets/tazer.obj", "assets/gradient.jpeg", {0, -2.2, 18.6}, {0, 0, 0}, {-1,-1,1}),
-    tazers2 = g3d.newModel("assets/tazer.obj", "assets/gradient.jpeg", {0, -2.2, 21.3}, {0, 0, 0}, {-1,-1,1}),
+    tazers = g3d.newModel("assets/ending.iqm", "assets/gradient.jpeg", {0, -2.2, 18.6}, {0, 0, 0}, {-1,-1,1}),
+    tazers2 = g3d.newModel("assets/ending.iqm", "assets/gradient.jpeg", {0, -2.2, 21.3}, {0, 0, 0}, {-1,-1,1}),
     hitVis = g3d.newModel("assets/hit.obj", "assets/gradient.jpeg", {0, -2.2, 21.3}, {0, 0, 0}, {-1,-1,1}),
     health = 30,
     maxHealth = 30,
@@ -172,6 +172,9 @@ end
 
 -- boss doesn't move a lot 
 function enemy:update(dt)
+
+    self.tazers:update(dt)
+
     if self.states.idle then
         self.timer = 0
         local vectorToPlayer = {x = self.position.x - player:getPosition().x, y = self.position.y - player:getPosition().y, z = self.position.z - player:getPosition().z}

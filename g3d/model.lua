@@ -9,6 +9,10 @@ local vectors = require(G3D_PATH .. "/vectors")
 local vectorCrossProduct = vectors.crossProduct
 local vectorNormalize = vectors.normalize
 
+iqm = require("libs/iqm")
+anim9 = require("libs/anim9")
+cpml  = require("libs/cpml")
+
 ----------------------------------------------------------------------------------------------------
 -- define a model class
 ----------------------------------------------------------------------------------------------------
@@ -40,26 +44,74 @@ local function newModel(verts, texture, translation, rotation, scale)
     -- if verts is a string, use it as a path to a .obj file
     -- otherwise verts is a table, use it as a model defintion
     if type(verts) == "string" then
-        verts = loadObjFile(verts)
+        local extension = verts:sub(-4,-1)
+        if extension == ".obj" then
+            print("obj" .. verts)
+            given = loadObjFile(verts)
+            
+            self.verts = given
+            self.mesh = love.graphics.newMesh(self.vertexFormat, self.verts, "triangles")
+            self.animated = false
+        elseif extension == ".iqm" then
+            print("iqm" .. verts)
+            local data = iqm.load(verts)
+            self.data = data
+            self.verts = data.triangles
+            self.mesh = data.mesh
+            self.animated = true
+    
+            self.anims = iqm.load_anims(verts)
+            self.animTracks = {}
+            self.anim = anim9(self.anims)
+            print(self.anims)
+            print(self.anim)
+        else
+            print("none ERROR")
+        end
+    else
+		--If given table of verticies (thanks hoarders house de estufa)
+		self.verts = verts
+		self.mesh = love.graphics.newMesh(self.vertexFormat, self.verts, "triangles")
+		self.animated = false
     end
-    assert(verts and type(verts) == "table", "Invalid vertices given to newModel")
+    assert(given and type(given) == "table", "Invalid vertices given to newModel")
 
     -- if texture is a string, use it as a path to an image file
     -- otherwise texture is already an image, so don't bother
     if type(texture) == "string" then
         texture = love.graphics.newImage(texture)
+        self.texture = texture
     end
 
+    -- tank you to Hoarder's Horrible House of Stuff for this iqm implementation
     -- initialize my variables
-    self.verts = verts
-    self.texture = texture
-    self.mesh = love.graphics.newMesh(self.vertexFormat, self.verts, "triangles")
+
     self.mesh:setTexture(self.texture)
     self.matrix = newMatrix()
     self:setTransform(translation or {0,0,0}, rotation or {0,0,0}, scale or {1,1,1})
     self:generateAABB()
 
     return self
+end
+-- all animation stuff taken from Hoarder's house TYSM 
+function model:update(dt)
+	if self.animated then
+		self.anim:update(dt)
+	end
+end
+
+function model:newAnimationTrack(name)
+	self.animTracks[name] = self.anim:new_track(name)
+end
+
+function model:playAnimation(name)
+	self.anim:play(self.animTracks[name])
+	self.anim:update(0)
+end
+
+function model:stopAnimation(name)
+	self.anim:stop(self.animTracks[name])
+    self.anim:update(0)
 end
 
 -- populate model's normals in model's mesh automatically
