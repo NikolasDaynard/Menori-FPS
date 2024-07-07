@@ -1,4 +1,4 @@
--- lunajson = require("testing")
+lunajson = require("libs.lunajson")
 require("audio")
 
 ---@diagnostic disable: undefined-field
@@ -162,12 +162,13 @@ end
 function settings:load()
     if love.filesystem.getInfo("settings.json") then
         local fileData = love.filesystem.read("settings.json")
-        -- local settingsArray = lunajson.decode(fileData)
+        local settingsArray = lunajson.decode(fileData)
 
         for i, ui in ipairs(self.ui) do
-            -- ui.value = (((settingsArray or {})[i] or ui.value))
+            ui.value = (((settingsArray or {})[i] or ui.value))
         end
     end
+    self.ui[1]:callback()
 end
 
 function settings:save()
@@ -177,6 +178,6 @@ function settings:save()
         table.insert(valuesToSave, ui.value)
     end
 
-    -- local jsonString = lunajson.encode(valuesToSave)
-    -- love.filesystem.write("settings.json", jsonString)
+    local jsonString = lunajson.encode(valuesToSave)
+    love.filesystem.write("settings.json", jsonString)
 end

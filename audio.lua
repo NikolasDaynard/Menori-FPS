@@ -1,5 +1,6 @@
 audio = {
-    loadedClips = {}
+    loadedClips = {},
+    volume = 1,
 }
 
 
@@ -11,7 +12,7 @@ function audio:playSound(name, stream, looping)
             self.loadedClips[name] = love.audio.newSource(name, "static")
         end
         self.loadedClips[name]:setLooping(looping)
-        -- self.loadedClips[name]:setVolume(settings:getSettings(1)) -- 1 is volume
+        self.loadedClips[name]:setVolume(self.volume) -- 1 is volume
     end
     self.loadedClips[name]:play()
 end
@@ -19,6 +20,7 @@ end
 function audio:setVolume(volume)
     for _, audio in pairs(self.loadedClips) do
         print("set" .. volume)
+        self.volume = volume
         audio:setVolume(volume)
     end
 end

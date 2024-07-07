@@ -190,6 +190,14 @@ function model:draw(shader)
     local shader = shader or self.shader
     love.graphics.setShader(shader)
     shader:send("modelMatrix", self.matrix)
+
+	if shader:hasUniform("animated") then
+		shader:send("animated", self.animated)
+	end
+	if self.animated and shader:hasUniform("u_pose") then
+		shader:send("u_pose", "column", unpack(self.anim.current_pose))
+	end
+    
     love.graphics.draw(self.mesh)
     love.graphics.setShader()
 end

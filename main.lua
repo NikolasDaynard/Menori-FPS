@@ -25,6 +25,7 @@ local rollingAverage = {}
 
 function love.load()
     settings:load()
+    settings:save()
 
     lg.setBackgroundColor(0.25,0.5,1)
 

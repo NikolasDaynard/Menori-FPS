@@ -24,7 +24,7 @@ function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVector
     intersection.distance = math.huge
     local hitModel = nil
     for _,entity in pairs(collisionModels) do
-        local distance, x, y, z, nx, ny, nz = entity.model:rayIntersection(playerX, playerY - .3, playerZ, cameraLookVectorX, cameraLookVectorY, cameraLookVectorZ)
+        local distance, x, y, z, nx, ny, nz = entity.model:rayIntersection(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVectorY, cameraLookVectorZ)
         if (distance or math.huge) < intersection.distance then
             intersection = {distance = distance, x = x, y = y, z = z, nx = nx, ny = ny, nz = nz}
             hitModel = entity.model
@@ -57,12 +57,12 @@ function gun:render()
 end
 
 function gun:updatePos(positionX, positionY, positionZ, playerViewDirX, playerViewDirY, playerViewDirZ)
-    angle = math.atan2(playerViewDirZ, playerViewDirX)
+    angle = -math.atan2(playerViewDirZ, playerViewDirX)- (math.pi / 2)
     translationY = (math.atan2(playerViewDirY, 1))
-    translationX = math.cos(angle) / 2
-    translationZ = math.sin(angle) / 2
-    -- print(angle)
-    gunMesh:setRotation(math.sin(translationY) - math.cos((-angle / 4)), -angle - (math.pi / 2), 0)
+    translationX = math.sin(angle) / 2
+    translationZ = math.cos(angle) / 2
+    print(angle)
+    gunMesh:setRotation(0, angle, 0)
 
     gunMesh:setTranslation(positionX + translationX, positionY + (translationY / 3), positionZ + translationZ)
 end

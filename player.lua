@@ -39,6 +39,7 @@ function Player:new(x,y,z)
     self.momentum = {x = 0, y = 0, z = 0}
     self.health = 70 -- frames of dmg
     self.doubleTapTimer = {key = "w", time = 0, taps = 0}
+    self.jumpTimer = 0
 
     return self
 end
@@ -138,6 +139,7 @@ function Player:update(dt)
     local dashForceZ = nil
 
     self.doubleTapTimer.time = self.doubleTapTimer.time + dt
+    self.jumpTimer = self.jumpTimer + dt
 
     -- friction
     self.speed.x = self.speed.x * friction
@@ -191,7 +193,8 @@ function Player:update(dt)
         self.height = 1
     end
 
-    if love.keyboard.isDown("space") then
+    if love.keyboard.isDown("space") and self.jumpTimer > .1 then
+        self.jumpTimer = 0
         if self.onGround then
             self.speed.y = self.speed.y - jump
         else
@@ -205,13 +208,20 @@ function Player:update(dt)
                     self.position.z - .1,
                     0.3
                 )
-                if len ~= nil and self.speed.y >= 0 then
+                local pushoffForce = 0
+                if math.abs(self.speed.y) > 0.05 then
+                    pushoffForce = 1 / 3
+                else
+                    pushoffForce = 1 / 30
+                end
+
+                if len ~= nil then
                     self.speed.y = self.speed.y - jump
     
                     local vector = {self.position.x - x, self.position.z - z}
                     local vectorX, _, vectorZ = vectors.normalize(vector[1], 0, vector[2])
-                    self.speed.x = self.speed.x + vectorX / 3 -- walljumo pushoff
-                    self.speed.z = self.speed.z + vectorZ / 3
+                    self.speed.x = self.speed.x + vectorX * pushoffForce-- walljumo pushoff
+                    self.speed.z = self.speed.z + vectorZ * pushoffForce
                     break
                 end
             end
@@ -315,7 +325,7 @@ function Player:update(dt)
     self.speed.z = self.speed.z * 5
     
     g3d.camera.position[1] = self.position.x
-    g3d.camera.position[2] = self.position.y - .5 * self.height
+    g3d.camera.position[2] = self.position.y + .01 * self.height
     g3d.camera.position[3] = self.position.z
     g3d.camera.lookInDirection()
 
@@ -329,7 +339,7 @@ function Player:interpolate(fraction)
     -- visual difference between the interpolated position and the real position
 
     g3d.camera.position[1] = self.position.x + self.speed.x*fraction
-    g3d.camera.position[2] = (self.position.y + self.speed.y*fraction) - .25 * self.height
+    -- g3d.camera.position[2] = (self.position.y + self.speed.y*fraction) - .25 * self.height
     g3d.camera.position[3] = self.position.z + self.speed.z*fraction
 
     g3d.camera.lookInDirection()
