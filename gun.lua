@@ -59,10 +59,10 @@ end
 function gun:updatePos(positionX, positionY, positionZ, playerViewDirX, playerViewDirY, playerViewDirZ)
     angle = -math.atan2(playerViewDirZ, playerViewDirX)- (math.pi / 2)
     translationY = (math.atan2(playerViewDirY, 1))
-    translationX = math.sin(angle) / 2
-    translationZ = math.cos(angle) / 2
-    print(angle)
-    gunMesh:setRotation(0, angle, 0)
+    translationX = -math.sin(angle + .5) / 2
+    translationZ = -math.cos(angle + 1) / 2
+    -- print(angle)
+    gunMesh:setRotation(translationX * translationY, angle, translationZ * translationY)
 
     gunMesh:setTranslation(positionX + translationX, positionY + (translationY / 3), positionZ + translationZ)
 end

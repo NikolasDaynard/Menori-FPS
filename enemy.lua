@@ -7,8 +7,8 @@ require("credits")
 
 enemy = {
     model = g3d.newModel("assets/shopkeep.obj", "assets/gradient.jpeg", {.1,-3,.1}, {0, 0, 0}, {-1,-1,1}),
-    tazers = g3d.newModel("assets/ending.iqm", "assets/gradient.jpeg", {0, -2.2, 18.6}, {0, 0, 0}, {-1,-1,1}),
-    tazers2 = g3d.newModel("assets/ending.iqm", "assets/gradient.jpeg", {0, -2.2, 21.3}, {0, 0, 0}, {-1,-1,1}),
+    tazers = g3d.newModel("assets/tazer.obj", "assets/gradient.jpeg", {.46896011086, 31.068234611258, -140.11638688191}, {0, 0, 0}, {-1,-1,1}),
+    tazers2 = g3d.newModel("assets/tazer.obj", "assets/gradient.jpeg", {0, -2.2, 21.3}, {0, 0, 0}, {-1,-1,1}),
     hitVis = g3d.newModel("assets/hit.obj", "assets/gradient.jpeg", {0, -2.2, 21.3}, {0, 0, 0}, {-1,-1,1}),
     health = 30,
     maxHealth = 30,
@@ -21,6 +21,9 @@ enemy = {
     timer = 0,
 }
 
+-- enemy.tazers:addAnimation({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 1, 24, "test")
+-- enemy.tazers:newAnimationsn("walk")
+-- enemy.tazers:play("walk")
 enemy.states = {
     idle = true,
     zapping = false,
@@ -122,7 +125,7 @@ entityHolder:addEntity(enemy, 8)
 
 function enemy:render()
     self.model:draw()
-    self.tazers:draw()
+    self.tazers:draw(nshader)
     self.tazers2:draw()
     self.hitVis:draw()
 end

@@ -63,8 +63,8 @@ local function newModel(verts, texture, translation, rotation, scale)
             self.anims = iqm.load_anims(verts)
             self.animTracks = {}
             self.anim = anim9(self.anims)
-            print(self.anims)
-            print(self.anim)
+            self.animations = {}
+            assert(self.anim ~= nil, "ANIMATIONS ON AN IQM MODEL CANNOT BE NIL")
         else
             print("none ERROR")
         end
@@ -109,6 +109,10 @@ function model:playAnimation(name)
 	self.anim:update(0)
 end
 
+function model:play(name)
+	self.anim:play(name)
+	self.anim:update(0)
+end
 function model:stopAnimation(name)
 	self.anim:stop(self.animTracks[name])
     self.anim:update(0)
@@ -192,12 +196,15 @@ function model:draw(shader)
     shader:send("modelMatrix", self.matrix)
 
 	if shader:hasUniform("animated") then
+        if (self.animated) then
+        print("has unitcor")
+        end
 		shader:send("animated", self.animated)
 	end
 	if self.animated and shader:hasUniform("u_pose") then
 		shader:send("u_pose", "column", unpack(self.anim.current_pose))
 	end
-    
+
     love.graphics.draw(self.mesh)
     love.graphics.setShader()
 end

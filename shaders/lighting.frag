@@ -1,6 +1,6 @@
 varying vec3 normal;
-varying vec3 vertexPosition;
-uniform vec3 lightPosition = vec3(0, 0, 0);
+varying vec4 vertexPosition;
+varying vec4 debug;
 uniform mat4 modelMatrix;
 
 uniform vec4 lights[3]; // x, y, z, lum
@@ -27,6 +27,9 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 
         // draw the color from the texture multiplied by the light amount
         lightness = lightness + diffuse;
+    }
+    if(debug == vec4(1, 0, 0, 0)){
+        return vec4(1, 1, 1, 1);
     }
     return vec4((texcolor * color).rgb * (lightness + .2), 1.0);
 }
