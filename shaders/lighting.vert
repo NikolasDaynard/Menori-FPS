@@ -8,6 +8,7 @@ uniform vec3 ambientVector;
 varying vec3 vertexNormal;
 
 varying vec4 vertexPosition;
+varying vec4 vertexRealPosition;
 varying vec4 debug;
 attribute vec4 VertexNormal;
 varying vec3 normal;
@@ -23,8 +24,8 @@ uniform mat4 u_pose[16]; //100 bones crashes web version, only set to whats abso
 vec4 position(mat4 transform_projection, vec4 vertex_position)
 {
     debug = vec4(0, 0, 0, 0);
-    // normal = vec3(vec4(modelMatrixInverse*VertexNormal));
-    normal = vec3(vec4(modelMatrix * VertexNormal));
+    // normal = normalize(vec3(vec4(modelMatrixInverse*VertexNormal)));
+    normal = normalize(vec3(vec4(modelMatrix * VertexNormal)));
 
     // taken from hoarders house tysm
     if (animated == true) {
@@ -37,5 +38,6 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
     };
 
     vertexPosition = projectionMatrix * viewMatrix * modelMatrix * vertex_position;
+    vertexRealPosition = vertex_position;
     return vertexPosition;
 }

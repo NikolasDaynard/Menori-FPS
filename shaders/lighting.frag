@@ -1,4 +1,5 @@
 varying vec3 normal;
+varying vec4 vertexRealPosition;
 varying vec4 vertexPosition;
 varying vec4 debug;
 uniform mat4 modelMatrix;
@@ -14,16 +15,17 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 
     // get color from the texture
     vec4 texcolor = Texel(tex, texture_coords);
+    if (texcolor.a == 0.0) { discard; }
     vec3 normal = normalize(mat3(modelMatrix) * normal);
     float lightness = 0;
 
     for(int i = 0; i < 3; i ++) {
-        vec3 lightDirection = normalize(lights[i].xyz - vertexPosition.xyz);
+        vec3 lightDirection = normalize(lights[i].xyz - vertexRealPosition.xyz);
         float diffuse = max(dot(lightDirection, normal) * lights[i].w, 0);
+        // float specular = min(dot(lightDirection, normal) * lights[i].w, .1);
 
 
         // if this pixel is invisible, get rid of it
-        if (texcolor.a == 0.0) { discard; }
 
         // draw the color from the texture multiplied by the light amount
         lightness = lightness + diffuse;
