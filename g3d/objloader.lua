@@ -26,6 +26,37 @@ local function concatTables(t1,t2,t3)
 end
 
 -- give path of file
+-- returns lines of the triangulated model
+local function triangulateObj(path)
+    lines = {}
+    -- go line by line through the file
+    for line in love.filesystem.lines(path) do
+        local words = {}
+
+        -- split the line into words
+        for word in line:gmatch("([^".."%s".."]+)") do
+            table.insert(words, word)
+        end
+
+        -- if the first word in this line is a "f", then this is a face
+        if words[1] == "f" then
+            -- verticies start at 2 for the descriptions because the first is 'f'
+            -- for every face, it inserts a triangle with the verticies: iteration, iteration - 1 and starting vertex
+            -- this ensures 2 verticies match and adds the third new one
+            -- if iteration < 4 then it is using the original first vertex as vertex 2 and as vertex 3 in the triangle
+            for i=#words, 4, -1 do
+                table.insert(lines, "f " .. words[i] .. " " .. words[i-1] .. " " .. words[2])
+            end
+            table.insert(lines, line)
+        else
+            -- if it's not a face, insert it
+            table.insert(lines, line)
+        end
+    end
+    return lines
+end
+
+-- give path of file
 -- returns a lua table representation
 local function objLoader(path)
     local verts = {}
@@ -34,7 +65,7 @@ local function objLoader(path)
     local normals = {}
 
     -- go line by line through the file
-    for line in love.filesystem.lines(path) do
+    for _,line in ipairs(triangulateObj(path)) do
         local words = {}
 
         -- split the line into words
@@ -62,9 +93,6 @@ local function objLoader(path)
         -- the arguments a point takes is v,vt,vn
         if words[1] == "f" then
             local store = {}
-
-            -- TODO allow models with untriangulated faces
-            assert(#words == 4, "Faces in "..path.." must be triangulated before they can be used in g3d!")
 
             for i=2, #words do
                 local num = ""
