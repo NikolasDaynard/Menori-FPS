@@ -49,10 +49,11 @@ function gun:update(dt)
     self.currentTime = self.currentTime + dt
 end
 
-function gun:render()
+function gun:render(shader)
+    shader = shader or nshader
     gunMesh:updateMatrix()
 
-    gunMesh:draw(nshader)
+    gunMesh:draw(shader)
     hitMesh:draw()
 end
 

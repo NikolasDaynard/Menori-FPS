@@ -197,7 +197,7 @@ function Player:update(dt)
         self.jumpTimer = 0
         if self.onGround then
             self.speed.y = self.speed.y - jump
-        else
+        elseif self.slidingVector == nil then
             for _,model in ipairs(self.collisionModels) do
                 local len, x,y,z, nx,ny,nz = model:capsuleIntersection(
                     self.position.x + .1,
@@ -345,8 +345,8 @@ function Player:interpolate(fraction)
     g3d.camera.lookInDirection()
 end
 
-function Player:render()
-    gun:render()
+function Player:render(shader)
+    gun:render(shader)
 end
 
 function Player:getPosition()

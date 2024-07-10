@@ -1,5 +1,6 @@
 io.stdout:setvbuf("no")
 nshader = love.graphics.newShader("shaders/lighting.vert", "shaders/lighting.frag")
+depthShader = love.graphics.newShader("shaders/depth.vert", "shaders/depth.frag")
 
 local lg = love.graphics
 lg.setDefaultFilter("linear")
@@ -36,6 +37,7 @@ function love.load()
     entityHolder:addEntity({model = map}, 1)
 
     canvas = {lg.newCanvas(1024,576), depth=true}
+    depthCanvas = {lg.newCanvas(1024,576), depth=true, format = "r16f", readable = true}
 end
 
 function love.update(dt)
@@ -147,13 +149,15 @@ function love.draw()
         g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
         nshader:send("viewMatrix", g3d.camera.viewMatrix)
 
-        g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
-        nshader:send("lights", {0, 0, 0, 1}, {0, 20, 30, 1})
+        renderDepthMap()
+        nshader:send("depthMap", depthCanvas[1])
+
+        nshader:send("lights", {0, 0, 0, 1}, {0, 20, 30, 1000}, {.46896011086, 28.068234611258, -140.11638688191, 1000})
 
         lg.setCanvas(canvas)
         lg.clear(0,0,0,0)
 
-        --lg.setDepthMode("lequal", true)
+        -- lg.setDepthMode("lequal", true)
         background:draw()
         player:render()
         entityHolder:renderEntities()
@@ -163,6 +167,8 @@ function love.draw()
 
         lg.setCanvas()
         lg.draw(canvas[1], 1024/2, 576/2, 0, 1,-1, 1024/2, 576/2)
+
+
         windowWidth, windowHeight = love.window.getMode()
         love.graphics.rectangle("fill", windowWidth - (windowWidth * .8), windowHeight - (windowHeight / 6), windowWidth * .6, windowHeight / 10)
         love.graphics.setColor(0, 0, 0)
@@ -176,4 +182,32 @@ function love.draw()
     settings:render()
 
     --lg.print(collectgarbage("count"))
+end
+
+function renderDepthMap()
+    love.graphics.setCanvas(depthCanvas)
+    lg.clear(0,0,0,0)
+
+    love.graphics.setShader(depthShader)
+
+    local camPos, camDir = g3d.camera.position, g3d.camera.target
+    -- g3d.camera.position, g3d.camera.target = {0, 20, 30}, {0, 0, 0}
+
+    g3d.camera.projectionMatrix:setProjectionMatrix(g3d.camera.fov, g3d.camera.nearClip, g3d.camera.farClip, g3d.camera.aspectRatio);
+    depthShader:send("projectionMatrix", g3d.camera.projectionMatrix)
+
+    g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
+    depthShader:send("viewMatrix", g3d.camera.viewMatrix)
+
+    -- Render the scene (replace model:draw() with your scene rendering code)
+    -- background:draw()
+    player:render(depthShader)
+    entityHolder:renderEntities(depthShader)
+    -- particles:render()
+
+    love.graphics.setShader()
+    love.graphics.setCanvas()
+
+    g3d.camera.position, g3d.camera.target = camPos, camDir
+    g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
 end

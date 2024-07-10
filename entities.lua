@@ -15,13 +15,14 @@ function entityHolder:getEntityFromModel(model)
     end
 end
 
-function entityHolder:renderEntities()
-    for k, v in pairs(self.entities) do
+function entityHolder:renderEntities(shader)
+    shader = shader or nshader
+    for _, v in pairs(self.entities) do
         if v.render then
-            v:render(nshader)
+            v:render(shader)
         else
             v.model:updateMatrix()
-            v.model:draw(nshader)
+            v.model:draw(shader)
         end
     end
 end

@@ -1,4 +1,5 @@
 varying vec3 normal;
+uniform Image depthMap;
 varying vec4 vertexRealPosition;
 varying vec4 vertexPosition;
 varying vec4 debug;
@@ -15,23 +16,29 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 
     // get color from the texture
     vec4 texcolor = Texel(tex, texture_coords);
+    vec2 shadowMapCoord = ((vertexRealPosition.xy)/vertexRealPosition.w);
+    vec4 depthColor = Texel(depthMap, shadowMapCoord);
+    
+    // if this pixel is invisible, get rid of it
     if (texcolor.a == 0.0) { discard; }
+    
     vec3 normal = normalize(mat3(modelMatrix) * normal);
     float lightness = 0;
 
     for(int i = 0; i < 3; i ++) {
         vec3 lightDirection = normalize(lights[i].xyz - vertexRealPosition.xyz);
-        float diffuse = max(dot(lightDirection, normal) * lights[i].w, 0);
-        // float specular = min(dot(lightDirection, normal) * lights[i].w, .1);
+        float distance = length(lights[i].xyz - vertexRealPosition.xyz);
+        float attenuation = lights[i].w / (distance * distance); // inverse square law
 
-
-        // if this pixel is invisible, get rid of it
+        float diffuse = max(dot(lightDirection, normal), 0.0) * attenuation;
 
         // draw the color from the texture multiplied by the light amount
-        lightness = lightness + diffuse;
+        lightness += diffuse;
     }
+    
     if(debug == vec4(1, 0, 0, 0)){
         return vec4(1, 1, 1, 1);
     }
-    return vec4((texcolor * color).rgb * (lightness + .2), 1.0);
+    // return vec4((texcolor * color).rgb * (lightness + 0.2), 1.0);
+    return depthColor;
 }

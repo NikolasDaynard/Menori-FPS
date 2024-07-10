@@ -26,37 +26,6 @@ local function concatTables(t1,t2,t3)
 end
 
 -- give path of file
--- returns lines of the triangulated model
-local function triangulateObj(path)
-    lines = {}
-    -- go line by line through the file
-    for line in love.filesystem.lines(path) do
-        local words = {}
-
-        -- split the line into words
-        for word in line:gmatch("([^".."%s".."]+)") do
-            table.insert(words, word)
-        end
-
-        -- if the first word in this line is a "f", then this is a face
-        if words[1] == "f" then
-            -- verticies start at 2 for the descriptions because the first is 'f'
-            -- for every face, it inserts a triangle with the verticies: iteration, iteration - 1 and starting vertex
-            -- this ensures 2 verticies match and adds the third new one
-            -- if iteration < 4 then it is using the original first vertex as vertex 2 and as vertex 3 in the triangle
-            for i=#words, 4, -1 do
-                table.insert(lines, "f " .. words[i] .. " " .. words[i-1] .. " " .. words[2])
-            end
-            table.insert(lines, line)
-        else
-            -- if it's not a face, insert it
-            table.insert(lines, line)
-        end
-    end
-    return lines
-end
-
--- give path of file
 -- returns a lua table representation
 local function objLoader(path)
     local verts = {}
@@ -65,7 +34,7 @@ local function objLoader(path)
     local normals = {}
 
     -- go line by line through the file
-    for _,line in ipairs(triangulateObj(path)) do
+    for line in love.filesystem.lines(path) do
         local words = {}
 
         -- split the line into words
@@ -91,54 +60,71 @@ local function objLoader(path)
         -- if the first word in this line is a "f", then this is a face
         -- a face takes three arguments which refer to points, each of those points take three arguments
         -- the arguments a point takes is v,vt,vn
+        -- if there is more than 3 it is split to be 3
         if words[1] == "f" then
-            local store = {}
-
-            for i=2, #words do
-                local num = ""
-                local word = words[i]
-                local ii = 1
-                local char = word:sub(ii,ii)
-
-                while true do
-                    char = word:sub(ii,ii)
-                    if char ~= "/" then
-                        num = num .. char
-                    else
-                        break
-                    end
-                    ii = ii + 1
-                end
-                store[#store+1] = tonumber(num)
-
-                local num = ""
-                ii = ii + 1
-                while true do
-                    char = word:sub(ii,ii)
-                    if ii <= #word and char ~= "/" then
-                        num = num .. char
-                    else
-                        break
-                    end
-                    ii = ii + 1
-                end
-                store[#store+1] = tonumber(num)
-
-                local num = ""
-                ii = ii + 1
-                while true do
-                    char = word:sub(ii,ii)
-                    if ii <= #word and char ~= "/" then
-                        num = num .. char
-                    else
-                        break
-                    end
-                    ii = ii + 1
-                end
-                store[#store+1] = tonumber(num)
+            local faceSplits = {}
+            local faceWords = {}
+            -- split faces into triangles
+            for i=#words, 4, -1 do
+                table.insert(faceSplits, "f " .. words[i] .. " " .. words[i-1] .. " " .. words[2])
             end
 
-            faces[#faces+1] = store
+            local store = {}
+            -- split the line into words
+            for _, split in ipairs(faceSplits) do
+                faceWords = {}
+                -- calculate the words for every face in the new face line
+                for word in split:gmatch("([^".."%s".."]+)") do
+                    table.insert(faceWords, word)
+                end
+                store = {}
+
+                -- add face
+                for i=2, 4 do
+                    local num = ""
+                    local word = faceWords[i]
+                    local ii = 1
+                    local char = word:sub(ii,ii)
+
+                    while true do
+                        char = word:sub(ii,ii)
+                        if char ~= "/" then
+                            num = num .. char
+                        else
+                            break
+                        end
+                        ii = ii + 1
+                    end
+                    store[#store+1] = tonumber(num)
+
+                    local num = ""
+                    ii = ii + 1
+                    while true do
+                        char = word:sub(ii,ii)
+                        if ii <= #word and char ~= "/" then
+                            num = num .. char
+                        else
+                            break
+                        end
+                        ii = ii + 1
+                    end
+                    store[#store+1] = tonumber(num)
+
+                    local num = ""
+                    ii = ii + 1
+                    while true do
+                        char = word:sub(ii,ii)
+                    if ii <= #word and char ~= "/" then
+                        num = num .. char
+                    else
+                        break
+                    end
+                    ii = ii + 1
+                end
+                store[#store+1] = tonumber(num)
+                end
+                faces[#faces+1] = store
+            end
         end
     end
 
