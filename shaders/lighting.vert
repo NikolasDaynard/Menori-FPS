@@ -10,6 +10,7 @@ varying vec3 vertexNormal;
 
 varying vec4 vertexPosition;
 varying vec4 vertexRealPosition;
+// varying vec4 vertexScreenPosition;
 varying vec4 debug;
 attribute vec4 VertexNormal;
 varying vec3 normal;
@@ -40,5 +41,6 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
 
     vertexPosition = projectionMatrix * viewMatrix * modelMatrix * vertex_position;
     vertexRealPosition = modelMatrix * vertex_position;
+
     return vertexPosition;
 }

@@ -2,6 +2,7 @@ varying vec3 normal;
 uniform Image depthMap;
 varying vec4 vertexRealPosition;
 varying vec4 vertexPosition;
+// varying vec4 vertexScreenPosition;
 varying vec4 debug;
 uniform mat4 modelMatrix;
 
@@ -11,15 +12,11 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
     // ALGORITHM CREDIT: https://love2d.org/forums/viewtopic.php?p=244728#p244728
 
-    // diffuse light
-    // computed by the dot product of the normal vector and the direction to the light source
-
     // get color from the texture
     vec4 texcolor = Texel(tex, texture_coords);
-    vec2 shadowMapCoord = ((vertexRealPosition.xy)/vertexRealPosition.w);
+    vec2 shadowMapCoord = ((vertexPosition.xy / vertexPosition.w) * 0.5) + 0.5;;
     vec4 depthColor = Texel(depthMap, shadowMapCoord);
-    
-    // if this pixel is invisible, get rid of it
+
     if (texcolor.a == 0.0) { discard; }
     
     vec3 normal = normalize(mat3(modelMatrix) * normal);
@@ -41,4 +38,5 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     }
     // return vec4((texcolor * color).rgb * (lightness + 0.2), 1.0);
     return depthColor;
+    // return vec4(shadowMapCoord.xy, 1.0, 1.0);
 }
