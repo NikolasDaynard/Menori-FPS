@@ -23,6 +23,7 @@ local canvas
 local accumulator = 0
 local frametime = 1/60
 local rollingAverage = {}
+local testingNum = 1
 
 function love.load()
     settings:load()
@@ -137,10 +138,6 @@ function love.mousemoved(x,y, dx,dy)
     end
 end
 
-local function setColor(r,g,b,a)
-    lg.setColor(r/255, g/255, b/255, a and a/255)
-end
-
 function love.draw()
     if not titlescreen.open then
         g3d.camera.projectionMatrix:setProjectionMatrix(g3d.camera.fov, g3d.camera.nearClip, g3d.camera.farClip, g3d.camera.aspectRatio);
@@ -185,19 +182,23 @@ function love.draw()
 end
 
 function renderDepthMap()
+    print(player.position.x, player.position.y, player.position.z)
+    testingNum = testingNum + .1
     love.graphics.setCanvas(depthCanvas)
     lg.clear(0,0,0,0)
 
     love.graphics.setShader(depthShader)
 
     local camPos, camDir = g3d.camera.position, g3d.camera.target
-    -- g3d.camera.position, g3d.camera.target = {0, 20, 30}, {0, 0, 0}
-
+    g3d.camera.position, g3d.camera.target =  {4.4504282675513,27.58430283093,-120.37671163157}, {1, 0, 1}
+    --{player.position.x, player.position.y, player.position.z}, {1, 0, 1}
+--{-3.1986443532513+ math.sin(testingNum),	31.568562429945 + math.sin(testingNum), -145.28014357952}
     g3d.camera.projectionMatrix:setProjectionMatrix(g3d.camera.fov, g3d.camera.nearClip, g3d.camera.farClip, g3d.camera.aspectRatio);
     depthShader:send("projectionMatrix", g3d.camera.projectionMatrix)
 
     g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
     depthShader:send("viewMatrix", g3d.camera.viewMatrix)
+    nshader:send("lightViewMatrix", g3d.camera.viewMatrix)
 
     -- Render the scene (replace model:draw() with your scene rendering code)
     -- background:draw()
