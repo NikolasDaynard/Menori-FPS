@@ -38,7 +38,7 @@ function love.load()
     entityHolder:addEntity({model = map}, 1)
 
     canvas = {lg.newCanvas(1024,576), depth=true}
-    depthCanvas = {lg.newCanvas(1024,576), depth=true, format = "r16f", readable = true}
+    depthCanvas = {lg.newCanvas(10240,5760), depth=true, format = "r16f", readable = true}
 end
 
 function love.update(dt)
@@ -190,7 +190,7 @@ function renderDepthMap()
     love.graphics.setShader(depthShader)
 
     local camPos, camDir = g3d.camera.position, g3d.camera.target
-    g3d.camera.position, g3d.camera.target =  {4.4504282675513,27.58430283093,-120.37671163157}, {1, 0, 1}
+    g3d.camera.position, g3d.camera.target =  {4.4504282675513,27.58430283093,-120.37671163157}, {4.4504282675513,25.58430283093,0}
     --{player.position.x, player.position.y, player.position.z}, {1, 0, 1}
 --{-3.1986443532513+ math.sin(testingNum),	31.568562429945 + math.sin(testingNum), -145.28014357952}
     g3d.camera.projectionMatrix:setProjectionMatrix(g3d.camera.fov, g3d.camera.nearClip, g3d.camera.farClip, g3d.camera.aspectRatio);
