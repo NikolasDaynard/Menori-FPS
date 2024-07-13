@@ -51,16 +51,14 @@ vec4 posterize(vec4 color, int steps, bool smoothen) {
     return color;
 }
 
-vec4 halftoneDots(vec2 screenCord) {
+vec4 halftoneDots(vec2 screenCord, float size) {
     // Scale screen coordinates to control the size of the dots
     const float scale = 9;
     vec2 scaledCoords = vec2(screenCord.x * (1024 / scale), screenCord.y * (576 / scale));
 
-    // Create a dot pattern using sine and cosine functions
     float pattern = sin(scaledCoords.x * 3.14159) * cos(scaledCoords.y * 3.14159);
 
-    // Use a threshold to determine dot color
-    float threshold = 0.5;
+    float threshold = size;
     if (pattern > threshold) {
         return vec4(1, 1, 1, 1); // White dot
     } else {
@@ -85,9 +83,24 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 
     // return sobelDepth;
     // return sobel(shadowMap, screenCord);
+    // return vec4(((halftoneDots(screenCord) * (1 - shadowMapBrightness))).rgb, 1);
 
-    return vec4((1 - (halftoneDots(screenCord) * (shadowMapBrightness))).rgb, 1);
+    vec4 posterizedMainTexture = posterize(mainTextureValue, 3, true);
 
-    return posterize(mainTextureValue, 3, true) + vec4((1 - (halftoneDots(screenCord) * (shadowMapBrightness))).rgb, 1);
+    vec4 halfToneSample = halftoneDots(screenCord, .5);
+    vec4 halftoneRender = 
+        max(
+            (posterizedMainTexture * vec4( (halfToneSample * (1 - shadowMapBrightness)).rgb,  1)),
+            vec4(0)); // half tone dots clamped
+
+    halftoneRender = posterize(halftoneRender, -1, true);
+    halftoneRender = max(halftoneRender, vec4(0));
+    // return halftoneRender;
+
+    return posterizedMainTexture + halftoneRender;
+
+    // return vec4((1 - (halftoneDots(screenCord) * (shadowMapBrightness))).rgb, 1);
+
+    return posterize(mainTextureValue, 3, true) + vec4((1 - (halftoneDots(screenCord, .5) * (shadowMapBrightness))).rgb, 1);
     // return posterize(mainTextureValue, 3); // I love my sobelito filter
 }
