@@ -72,9 +72,8 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     }
     if (inShadow == true) {
         // some debug color (home improvment?)
-        // return vec4(.2, .3, 1, 1);
+        return vec4(.2, .3, 1, 1);
     }
-    // return vec4(vec3(1 * (pow(currentDepth, 100))), 1.0);
-    // return vec4(vec3(shadowDepth), 1.0);
-    return vec4((texcolor * color).rgb * (lightness + 0.2), 1.0);
+
+    return vec4(vec3(max(lightness + 0.2, 0), max(-1 + (lightness + 0.2), 0), max(-2 + (lightness + 0.2), 0)), 1.0);
 }
