@@ -23,6 +23,7 @@ local g3d = {}
 g3d.newModel = require(G3D_PATH .. "/model")
 g3d.camera = require(G3D_PATH .. "/camera")
 g3d.shader = require(G3D_PATH .. "/shader")
+g3d.shaderParser = require(G3D_PATH .. "/shaderParser")
 g3d.vectors = require(G3D_PATH .. "/vectors")
 g3d.collisions = require(G3D_PATH .. "/collisions")
 

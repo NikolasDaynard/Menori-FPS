@@ -19,7 +19,7 @@ end
 
 function audio:setVolume(volume)
     for _, audio in pairs(self.loadedClips) do
-        print("set" .. volume)
+        -- print("set" .. volume)
         self.volume = volume
         audio:setVolume(volume)
     end

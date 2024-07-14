@@ -46,14 +46,14 @@ local function newModel(verts, texture, translation, rotation, scale)
     if type(verts) == "string" then
         local extension = verts:sub(-4,-1)
         if extension == ".obj" then
-            print("obj" .. verts)
+            -- print("obj" .. verts)
             given = loadObjFile(verts)
             
             self.verts = given
             self.mesh = love.graphics.newMesh(self.vertexFormat, self.verts, "triangles")
             self.animated = false
         elseif extension == ".iqm" then
-            print("iqm" .. verts)
+            -- print("iqm" .. verts)
             local data = iqm.load(verts)
             self.data = data
             self.verts = data.triangles
@@ -197,7 +197,7 @@ function model:draw(shader)
 
 	if shader:hasUniform("animated") then
         if (self.animated) then
-        print("has unitcor")
+        -- print("has unitcor")
         end
 		shader:send("animated", self.animated)
 	end

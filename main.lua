@@ -1,16 +1,18 @@
+local g3d = require "g3d"
+local Player = require "player"
+local shaderParser = require "g3d/shaderParser"
+
 io.stdout:setvbuf("no")
 nshader = love.graphics.newShader("shaders/lighting.vert", "shaders/lighting.frag")
 depthShader = love.graphics.newShader("shaders/depth.vert", "shaders/depth.frag")
 shadowShader = love.graphics.newShader("shaders/lighting.vert", "shaders/shadowMap.frag")
 postProcessShader = love.graphics.newShader("shaders/lighting.vert", "shaders/postProcess.frag")
+testShader = shaderParser:loadShader("shaders/lighting.vert", "shaders/testPasses.frag")
+
 
 local lg = love.graphics
 lg.setDefaultFilter("linear")
 
-local g3d = require "g3d"
-local Player = require "player"
-local vectors = require "g3d/vectors"
-local primitives = require "primitives"
 -- require("cpml")
 
 require("enemy")
