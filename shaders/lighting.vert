@@ -17,7 +17,7 @@ varying vec3 normal;
 
 uniform bool animated;
 
-uniform vec4 lights[3]; // x, y, z, lum
+uniform vec4 lights[300]; // x, y, z, lum
 
 attribute vec4 VertexWeight;
 attribute vec4 VertexBone;

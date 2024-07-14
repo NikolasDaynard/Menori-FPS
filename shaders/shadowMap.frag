@@ -9,8 +9,7 @@ uniform mat4 lightViewMatrix; // Transformation from world space to light's view
 uniform mat4 viewMatrix; // Transformation from world space to light's view space
 // uniform mat4 lightProjectionMatrix; // Light's projection matrix
 
-uniform vec4 lights[3]; // x, y, z, lum
-// uniform mat4 lightProjectionMatrix; // Add this uniform
+uniform vec4 lights[300]; // x, y, z, lum
 
 float getInterpolatedDepth(Image depthMap, vec2 uv) {
     // Sample the current texel
@@ -41,7 +40,7 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     vec3 shadowMapCoord = lightSpacePosition.xyz / lightSpacePosition.w;
     shadowMapCoord = shadowMapCoord * 0.5 + 0.5;
 
-    float shadowDepth = getInterpolatedDepth(depthMap, shadowMapCoord.xy);//Texel(depthMap, shadowMapCoord.xy).r;
+    float shadowDepth = Texel(depthMap, shadowMapCoord.xy).r;//Texel(depthMap, shadowMapCoord.xy).r;
 
     bool inBounds = all(greaterThanEqual(shadowMapCoord, vec3(0.0))) && all(lessThanEqual(shadowMapCoord, vec3(1.0)));
 
@@ -49,12 +48,14 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     float lightness = 0.0;
     bool inShadow = false;
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 300; i++) {
         vec3 lightDirection = normalize(lights[i].xyz - vertexRealPosition.xyz);
         float distance = length(lights[i].xyz - vertexRealPosition.xyz);
         float attenuation = lights[i].w / (distance * distance);
 
-        float diffuse = max(dot(lightDirection, normal), 0.0) * attenuation;
+
+        // float diffuse = max(abs(dot(lightDirection, normal)), 0.0) * attenuation;
+        float diffuse = attenuation; // this is super npr but looks great
 
         float bias = 0.005;
         if (shadowDepth - bias > currentDepth && inBounds) {

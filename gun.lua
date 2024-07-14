@@ -7,7 +7,7 @@ gun = {
     currentTime = 0,
     firerate = 1,
 }
-local gunMesh = g3d.newModel("assets/shockGun.obj", "assets/rust.png", nil, nil, {-1, -1, 1})
+local gunMesh = g3d.newModel("assets/shockGun.obj", nil, nil, nil, {-1, -1, 1})
 local hitMesh = g3d.newModel("assets/icoSphere.obj", "assets/tileset.png", nil, nil, {-1, -1, 1})
 
 function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVectorY, cameraLookVectorZ, collisionModels)
@@ -53,7 +53,9 @@ function gun:render(shader)
     shader = shader or nshader
     gunMesh:updateMatrix()
 
+    love.graphics.setColor(.1, .1, 1)
     gunMesh:draw(shader)
+    love.graphics.setColor(1, 1, 1)
     hitMesh:draw()
 end
 

@@ -114,7 +114,7 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 
     vec4 sobelDepth = sobel(depthMap, screenCord);
 
-    vec4 posterizedMainTexture = posterize(mainTextureValue, 3, true);
+    vec4 posterizedMainTexture = mainTextureValue; //posterize(mainTextureValue, 1000, true);
 
     vec4 halfToneSample = halftoneDots(screenCord, .5);
     vec4 halftoneRender = 
@@ -124,7 +124,6 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 
     halftoneRender = posterize(halftoneRender, -1, true);
     halftoneRender = max(halftoneRender, vec4(0));
-    // return halftoneRender;
 
     return (posterizedMainTexture + halftoneRender) * lineArt;
 

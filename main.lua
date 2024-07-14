@@ -7,7 +7,7 @@ nshader = love.graphics.newShader("shaders/lighting.vert", "shaders/lighting.fra
 depthShader = love.graphics.newShader("shaders/depth.vert", "shaders/depth.frag")
 shadowShader = love.graphics.newShader("shaders/lighting.vert", "shaders/shadowMap.frag")
 postProcessShader = love.graphics.newShader("shaders/lighting.vert", "shaders/postProcess.frag")
-testShader = shaderParser:loadShader("shaders/lighting.vert", "shaders/testPasses.frag")
+-- testShader = shaderParser:loadShader("shaders/lighting.vert", "shaders/testPasses.frag")
 
 
 local lg = love.graphics
@@ -158,11 +158,11 @@ function love.draw()
         renderDepthMap() -- for lights
 
         shadowShader:send("depthMap", depthCanvas[1])
-        shadowShader:send("lights", {0, 0, 0, 1}, {0, 20, 30, 1000}, {.46896011086, 28.068234611258, -140.11638688191, 1000})
+        shadowShader:send("lights", {0, 0, 0, 1}, {0, 20, 30, 1000}, {.46896011086, 28.068234611258, -140.11638688191, 1000}, {player.position.x, player.position.y, player.position.z, 1},
+            {2.4586457962785, 22.44266368657, -84.66726619135, 100}, {-1.5172019994414, 5.3613756921415, -40.334380144965, 100},
+            {-0.079625066433341, -8.800413307152, -69.816461059072, 200}, {2.9964433855589, -0.97999999999998, -0.017059775528852, 200})
 
         renderPass(shadowShader, shadowCanvas) -- shadow map
-
-        nshader:send("shadowMap", shadowCanvas[1])
 
         renderPass(nshader, mainCanvas)
 
@@ -187,10 +187,16 @@ function love.draw()
     titlescreen:render()
     credits:render()
     settings:render()
+    -- print(player.position.x, player.position.y, player.position.z)
 
     -- lg.print(collectgarbage("count"))
 end
 
+
+-- 0.74840292151714	-18.01588988934	-36.476757287978
+
+
+-- 2.9964433855589	-0.97999999999998	-0.017059775528852
 function renderDepthMap()
     local camPos, camDir = g3d.camera.position, g3d.camera.target
     g3d.camera.position, g3d.camera.target =  {4.4504282675513,27.58430283093,-120.37671163157}, {4.4504282675513,25.58430283093,0}
@@ -210,10 +216,6 @@ function renderDepthMap()
     -- restore the matrix after lighting render
     depthShader:send("viewMatrix", g3d.camera.viewMatrix)
     depthShader:send("projectionMatrix", g3d.camera.projectionMatrix)
-end
-
-function renderPostProcess()
-
 end
 
 function renderPass(shader, canvas)
