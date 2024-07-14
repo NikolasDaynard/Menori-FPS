@@ -99,14 +99,14 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     vec4 depthMapValue = Texel(depthMap, screenCord);
     vec4 mainTextureValue = Texel(mainTexture, screenCord);
 
-    vec4 lineArt = sobel(mainTexture, screenCord) * (vec4(1, 1, 1, 2) - sobel(depthMap, screenCord));
+    vec4 lineArt = sobel(mainTexture, screenCord) + sobel(depthMap, screenCord);
     lineArt = vec4(max(lineArt - .07, 0).rgb, 1); 
     lineArt = min(lineArt * 100, 1);
+    lineArt = vec4(vec3(lineArt.r), 1.0);
 
     // return lineArt;
     // return vec4(normal * mainTextureValue.rgb, 1.0);
     // return gaussianBlur(mainTexture, screenCord, 9);
-    return differenceOfGaussians(mainTexture, screenCord);
 
     // apply lighting
     mainTextureValue = mainTextureValue + (shadowMapBrightness / 20); // Wash out bright spots
@@ -126,7 +126,7 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     halftoneRender = max(halftoneRender, vec4(0));
     // return halftoneRender;
 
-    return posterizedMainTexture + halftoneRender;
+    return (posterizedMainTexture + halftoneRender) * lineArt;
 
     // return vec4((1 - (halftoneDots(screenCord) * (shadowMapBrightness))).rgb, 1);
 
