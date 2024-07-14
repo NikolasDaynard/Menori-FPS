@@ -16,9 +16,6 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     vec2 shadowMapCord = vec2((((vertexPosition.xy / vertexPosition.w) * 0.5) + 0.5));
 
     vec4 shadowMapValue = Texel(shadowMap, shadowMapCord);
-    float shadowMapBrightness = max(shadowMapValue.r, 0) + max(shadowMapValue.g, 0) + max(shadowMapValue.b, 0); // remove the clamp
 
-    texcolor = texcolor + (shadowMapBrightness / 20); // Wash out bright spots
-
-    return vec4(((texcolor * color) * (shadowMapBrightness)).rgb, 1.0);
+    return vec4(((texcolor * color)).rgb, 1.0);
 }

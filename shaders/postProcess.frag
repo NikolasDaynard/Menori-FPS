@@ -10,6 +10,29 @@ uniform mat4 projectionMatrix;
 uniform mat4 lightViewMatrix; // Transformation from world space to light's view space
 uniform mat4 viewMatrix; // Transformation from world space to light's view space
 
+uniform float weight[5] = float[5](0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+// def stolen
+vec4 gaussianBlur(Image tex, vec2 coord, int kernelSize)
+{
+    vec3 result = Texel(tex, coord).rgb * weight[0];
+	float w = 1.0 / 1024;
+	float h = 1.0 / 576;
+
+    for (int i = 1; i < kernelSize; ++i)
+    {
+        result += Texel(tex, coord + vec2(w * i, 0.0)).rgb * weight[i];
+        result += Texel(tex, coord - vec2(w * i, 0.0)).rgb * weight[i];
+        result += Texel(tex, coord + vec2(0.0, h * i)).rgb * weight[i];
+        result += Texel(tex, coord - vec2(0.0, h * i)).rgb * weight[i];
+    }
+
+    return vec4(result.rgb, 1);
+}
+
+vec4 differenceOfGaussians(Image tex, vec2 coord) {
+    return vec4(max(gaussianBlur(tex, coord, 2) - gaussianBlur(tex, coord, 5), vec4(0.1)).rgb, 1);
+}
+
 // sobel taken from this gist tysm! https://gist.github.com/Hebali/6ebfc66106459aacee6a9fac029d0115
 void make_kernel(inout vec4 n[9], Image tex, vec2 coord)
 {
@@ -76,14 +99,20 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     vec4 depthMapValue = Texel(depthMap, screenCord);
     vec4 mainTextureValue = Texel(mainTexture, screenCord);
 
+    vec4 lineArt = sobel(mainTexture, screenCord) * (vec4(1, 1, 1, 2) - sobel(depthMap, screenCord));
+    lineArt = vec4(max(lineArt - .07, 0).rgb, 1); 
+    lineArt = min(lineArt * 100, 1);
 
-    // vec4 sobelDepth = vec4(1, 1, 1, 2) - sobel(depthMap, screenCord); //inverts
+    // return lineArt;
+    // return vec4(normal * mainTextureValue.rgb, 1.0);
+    // return gaussianBlur(mainTexture, screenCord, 9);
+    return differenceOfGaussians(mainTexture, screenCord);
 
-    vec4 sobelDepth = sobel(depthMap, screenCord) - vec4(vec3(.9), 0);
+    // apply lighting
+    mainTextureValue = mainTextureValue + (shadowMapBrightness / 20); // Wash out bright spots
+    mainTextureValue = mainTextureValue * vec4(vec3(shadowMapBrightness), 1);
 
-    // return sobelDepth;
-    // return sobel(shadowMap, screenCord);
-    // return vec4(((halftoneDots(screenCord) * (1 - shadowMapBrightness))).rgb, 1);
+    vec4 sobelDepth = sobel(depthMap, screenCord);
 
     vec4 posterizedMainTexture = posterize(mainTextureValue, 3, true);
 
