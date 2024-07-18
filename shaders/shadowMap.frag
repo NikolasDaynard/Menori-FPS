@@ -7,7 +7,7 @@ uniform mat4 modelMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 lightViewMatrix; // Transformation from world space to light's view space
 uniform mat4 viewMatrix; // Transformation from world space to light's view space
-// uniform mat4 lightProjectionMatrix; // Light's projection matrix
+uniform mat4 lightProjectionMatrix; // Light's projection matrix
 
 uniform vec4 lights[300]; // x, y, z, lum
 
@@ -35,8 +35,8 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     vec4 texcolor = Texel(tex, texture_coords);
     if (texcolor.a == 0.0) { discard; }
 
-    vec4 lightSpacePosition = projectionMatrix * lightViewMatrix * vertexRealPosition;
-    float currentDepth = 1 - (lightSpacePosition.z / 200);
+    vec4 lightSpacePosition = lightProjectionMatrix * lightViewMatrix * vertexRealPosition;
+    float currentDepth = 1 - (lightSpacePosition.z / 200.0);
     vec3 shadowMapCoord = lightSpacePosition.xyz / lightSpacePosition.w;
     shadowMapCoord = shadowMapCoord * 0.5 + 0.5;
 
@@ -48,7 +48,10 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     float lightness = 0.0;
     bool inShadow = false;
 
-    for (int i = 0; i < 300; i++) {
+    for (int i = 0; i < 300; i++) { // todo this is super slow? sampling?
+        if (lights[i].w == 0) {
+            continue; 
+        }
         vec3 lightDirection = normalize(lights[i].xyz - vertexRealPosition.xyz);
         float distance = length(lights[i].xyz - vertexRealPosition.xyz);
         float attenuation = lights[i].w / (distance * distance);

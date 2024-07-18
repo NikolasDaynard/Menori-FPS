@@ -4,7 +4,7 @@ local shaderParser = require "g3d/shaderParser"
 
 io.stdout:setvbuf("no")
 nshader = love.graphics.newShader("shaders/lighting.vert", "shaders/lighting.frag")
-depthShader = love.graphics.newShader("shaders/depth.vert", "shaders/depth.frag")
+depthShader = love.graphics.newShader("shaders/lighting.vert", "shaders/depth.frag")
 shadowShader = love.graphics.newShader("shaders/lighting.vert", "shaders/shadowMap.frag")
 postProcessShader = love.graphics.newShader("shaders/lighting.vert", "shaders/postProcess.frag")
 -- testShader = shaderParser:loadShader("shaders/lighting.vert", "shaders/testPasses.frag")
@@ -12,8 +12,6 @@ postProcessShader = love.graphics.newShader("shaders/lighting.vert", "shaders/po
 
 local lg = love.graphics
 lg.setDefaultFilter("linear")
-
--- require("cpml")
 
 require("enemy")
 require("particles")
@@ -28,6 +26,10 @@ local accumulator = 0
 local frametime = 1/60
 local rollingAverage = {}
 
+-- for k,v in pairs(love.graphics.getCanvasFormats( )) do
+--     print("k: " .. k .. " v: " .. tostring(v))
+-- end
+
 function love.load()
     settings:load()
     settings:save()
@@ -40,9 +42,9 @@ function love.load()
     player:addCollisionModel(map)
     entityHolder:addEntity({model = map}, 1)
 
-    mainCanvas = {lg.newCanvas(1024,576), depth=true}
+    mainCanvas = {lg.newCanvas(1024,576), depth=true} -- all the depth=true def don't work but g3d says to
     postProcessCanvas = {lg.newCanvas(1024,576), depth=true}
-    depthCanvas = {lg.newCanvas(1024,576), depth=true, format = "r16f", readable = true}
+    depthCanvas = {lg.newCanvas(1024 * 1.5,576 * 1.5, {format = "rgba32f"}), depth=true, readable = true} -- bigger is better shadow quality
     shadowCanvas = {lg.newCanvas(1024,576), depth=true, format = "r16f", readable = true}
 end
 
@@ -61,7 +63,7 @@ function love.update(dt)
         table.remove(rollingAverage, 1)
     end
     local avg = 0
-    for i,v in ipairs(rollingAverage) do
+    for _,v in ipairs(rollingAverage) do
         avg = avg + v
     end
 
@@ -164,7 +166,7 @@ function love.draw()
 
         renderPass(shadowShader, shadowCanvas) -- shadow map
 
-        renderPass(nshader, mainCanvas)
+        renderPass(nshader, mainCanvas) -- main render, projection
 
         renderPass(depthShader, depthCanvas) -- for camera
         
@@ -192,16 +194,11 @@ function love.draw()
     -- lg.print(collectgarbage("count"))
 end
 
-
--- 0.74840292151714	-18.01588988934	-36.476757287978
-
-
--- 2.9964433855589	-0.97999999999998	-0.017059775528852
 function renderDepthMap()
     local camPos, camDir = g3d.camera.position, g3d.camera.target
     g3d.camera.position, g3d.camera.target =  {4.4504282675513,27.58430283093,-120.37671163157}, {4.4504282675513,25.58430283093,0}
-    g3d.camera.projectionMatrix:setProjectionMatrix(g3d.camera.fov, g3d.camera.nearClip, g3d.camera.farClip, g3d.camera.aspectRatio);
     depthShader:send("projectionMatrix", g3d.camera.projectionMatrix)
+    shadowShader:send("lightProjectionMatrix", g3d.camera.projectionMatrix)
 
     g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
     depthShader:send("viewMatrix", g3d.camera.viewMatrix)
@@ -210,10 +207,11 @@ function renderDepthMap()
 
     renderPass(depthShader, depthCanvas)
 
+    -- restore the matrix after lighting render
+
     g3d.camera.position, g3d.camera.target = camPos, camDir
     g3d.camera.viewMatrix:setViewMatrix(g3d.camera.position, g3d.camera.target, g3d.camera.down);
 
-    -- restore the matrix after lighting render
     depthShader:send("viewMatrix", g3d.camera.viewMatrix)
     depthShader:send("projectionMatrix", g3d.camera.projectionMatrix)
 end

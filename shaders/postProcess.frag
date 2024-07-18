@@ -89,7 +89,6 @@ vec4 halftoneDots(vec2 screenCord, float size) {
     }
 }
 
-
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
     vec2 screenCord = vec2((((vertexPosition.xy / vertexPosition.w) * 0.5) + 0.5));
@@ -99,7 +98,11 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     vec4 depthMapValue = Texel(depthMap, screenCord);
     vec4 mainTextureValue = Texel(mainTexture, screenCord);
 
-    vec4 lineArt = sobel(mainTexture, screenCord) + sobel(depthMap, screenCord);
+    // return vec4(depthMapValue);
+
+    // return sobel(depthMap, screenCord); // reveals issue
+
+    vec4 lineArt = min(sobel(mainTexture, screenCord), sobel(depthMap, screenCord));
     lineArt = vec4(max(lineArt - .07, 0).rgb, 1); 
     lineArt = min(lineArt * 100, 1);
     lineArt = vec4(vec3(lineArt.r), 1.0);
