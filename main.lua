@@ -18,6 +18,7 @@ require("particles")
 require("titlescreen")
 require("settings")
 require("audio")
+require("rhythm.beat")
 
 local map, background
 player = {}
@@ -75,6 +76,7 @@ function love.update(dt)
     end
     entityHolder:updateEntities(dt)
     particles:update(dt)
+    beat:update(dt)
 
     -- interpolate player between frames
     -- to stop camera jitter when fps and timestep do not match

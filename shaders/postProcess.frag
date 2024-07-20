@@ -34,10 +34,10 @@ vec4 differenceOfGaussians(Image tex, vec2 coord) {
 }
 
 // sobel taken from this gist tysm! https://gist.github.com/Hebali/6ebfc66106459aacee6a9fac029d0115
-void make_kernel(inout vec4 n[9], Image tex, vec2 coord)
+void make_kernel(inout vec4 n[9], Image tex, vec2 coord, float thickness)
 {
-	float w = 1.0 / 1024;
-	float h = 1.0 / 576;
+	float w = (1.0 / 1024) * thickness;
+	float h = (1.0 / 576) * thickness;
 
 	n[0] = Texel(tex, coord + vec2( -w, -h));
 	n[1] = Texel(tex, coord + vec2(0.0, -h));
@@ -50,9 +50,20 @@ void make_kernel(inout vec4 n[9], Image tex, vec2 coord)
 	n[8] = Texel(tex, coord + vec2(  w, h));
 }
 
+vec4 sobelThickness(Image sobelImage, vec2 screenCord, float thickness) {
+	vec4 n[9];
+	make_kernel( n, sobelImage, screenCord, thickness );
+
+	vec4 sobel_edge_h = n[2] + (2.0*n[5]) + n[8] - (n[0] + (2.0*n[3]) + n[6]);
+  	vec4 sobel_edge_v = n[0] + (2.0*n[1]) + n[2] - (n[6] + (2.0*n[7]) + n[8]);
+	vec4 sobel = sqrt((sobel_edge_h * sobel_edge_h) + (sobel_edge_v * sobel_edge_v));
+
+	return vec4( 1.0 - sobel.rgb, 1.0 );
+}
+
 vec4 sobel(Image sobelImage, vec2 screenCord) {
 	vec4 n[9];
-	make_kernel( n, sobelImage, screenCord );
+	make_kernel( n, sobelImage, screenCord, 1.0 );
 
 	vec4 sobel_edge_h = n[2] + (2.0*n[5]) + n[8] - (n[0] + (2.0*n[3]) + n[6]);
   	vec4 sobel_edge_v = n[0] + (2.0*n[1]) + n[2] - (n[6] + (2.0*n[7]) + n[8]);
@@ -98,18 +109,12 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
     vec4 depthMapValue = Texel(depthMap, screenCord);
     vec4 mainTextureValue = Texel(mainTexture, screenCord);
 
-    // return vec4(depthMapValue);
+    // vec4 lineArt = (sobelThickness(depthMap, screenCord, 2.5) - sobelThickness(depthMap, screenCord, 1) + 1);
+    vec4 lineArt = (sobelThickness(depthMap, screenCord, 1.1));
+    lineArt = min((lineArt - .9) * 1000, 1);
+    lineArt = vec4(vec3(lineArt.rgb), 1);
 
-    // return sobel(depthMap, screenCord); // reveals issue
-
-    vec4 lineArt = min(sobel(mainTexture, screenCord), sobel(depthMap, screenCord));
-    lineArt = vec4(max(lineArt - .07, 0).rgb, 1); 
-    lineArt = min(lineArt * 100, 1);
     lineArt = vec4(vec3(lineArt.r), 1.0);
-
-    // return lineArt;
-    // return vec4(normal * mainTextureValue.rgb, 1.0);
-    // return gaussianBlur(mainTexture, screenCord, 9);
 
     // apply lighting
     mainTextureValue = mainTextureValue + (shadowMapBrightness / 20); // Wash out bright spots
@@ -117,7 +122,7 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 
     vec4 sobelDepth = sobel(depthMap, screenCord);
 
-    vec4 posterizedMainTexture = mainTextureValue; //posterize(mainTextureValue, 1000, true);
+    vec4 posterizedMainTexture = posterize(mainTextureValue, 1000, true);
 
     vec4 halfToneSample = halftoneDots(screenCord, .5);
     vec4 halftoneRender = 

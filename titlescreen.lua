@@ -1,4 +1,5 @@
 require("audio")
+require("rhythm.beat")
 
 audio:playSound("audio/Blast Zone - Hour 5 - COMPLETED.mp3", true, true)
 
@@ -12,7 +13,8 @@ function titlescreen:update()
     if love.mouse.isDown(1) and self.open then
         self.open = false
         love.audio.stop()
-        audio:playSound("audio/Battle Theme.mp3", true, true)
+        audio:playSound("audio/Blasting Off Hour 4.mp3", true, true)
+        beat:playMetronome()
     end
 end
 

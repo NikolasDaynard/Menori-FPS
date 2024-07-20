@@ -11,25 +11,6 @@ uniform mat4 lightProjectionMatrix; // Light's projection matrix
 
 uniform vec4 lights[300]; // x, y, z, lum
 
-float getInterpolatedDepth(Image depthMap, vec2 uv) {
-    // Sample the current texel
-    float depth = Texel(depthMap, uv.xy).r;
-
-    const float sampleDist = 0.0002;
-
-    // Sample the four neighboring texels
-    float dUp = Texel(depthMap, vec2(uv.x, uv.y + sampleDist)).r;
-    float dDown = Texel(depthMap, vec2(uv.x, uv.y - sampleDist)).r;
-    float dRight = Texel(depthMap, vec2(uv.x + sampleDist, uv.y)).r;
-    float dLeft = Texel(depthMap, vec2(uv.x - sampleDist, uv.y)).r;
-
-    // Compute the average of the current texel and the neighboring texels
-    float avg = (depth + dUp + dDown + dRight + dLeft) / 5;
-
-    return avg;
-}
-
-
 vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 {
     vec4 texcolor = Texel(tex, texture_coords);

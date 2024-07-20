@@ -2,6 +2,7 @@ local g3d = require "g3d"
 -- local camera = require "g3d/camera"
 local collisions = require "g3d/collisions"
 require("particles")
+require("rhythm.beat")
 
 gun = {
     currentTime = 0,
@@ -33,9 +34,8 @@ function gun:fire(playerX, playerY, playerZ, cameraLookVectorX, cameraLookVector
     if hitModel then
         hitMesh:setTranslation(intersection.x, intersection.y, intersection.z)
         local entity = entityHolder:getEntityFromModel(hitModel)
-        if self.currentTime > self.firerate then
-            audio:playSound("audio/tu.wav", false, false)
-            self.currentTime = 0
+        if beat:isClickOnBeat() then
+            audio:playSound("audio/tu copy.wav", false, false)
             if entity.health then
                 local rand = math.random()
                 particles:addParticle(intersection.x, intersection.y, intersection.z, translationX + math.cos(rand) / 10, math.cos(math.random()) / 10 - .05, translationZ + math.sin(rand) / 10)
