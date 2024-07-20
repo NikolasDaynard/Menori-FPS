@@ -7,7 +7,7 @@ beat = {
 }
 
 function beat:playMetronome()
-    audio:playSound("audio/tu.wav", false, false)
+    audio:playSound("audio/met2.wav", false, false)
     self.currentTime = 0
     self.timesPlayed = 0
 end
@@ -16,7 +16,7 @@ function beat:update(dt)
     self.currentTime = self.currentTime + dt
     local beatInterval = 60 / self.bpm
     if (self.currentTime - (self.timesPlayed * beatInterval)) >= beatInterval then
-        audio:playSound("audio/tu.wav", false, false)
+        audio:playSound("audio/met2.wav", false, false)
         self.timesPlayed = self.timesPlayed + 1
     end
 end
