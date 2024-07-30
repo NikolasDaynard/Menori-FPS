@@ -51,10 +51,12 @@ function love.load()
     player:addCollisionModel(map)
     entityHolder:addEntity({model = map}, 1)
 
-    mainCanvas = {lg.newCanvas(1024,576), depth=true} -- all the depth=true def don't work but g3d says to
-    postProcessCanvas = {lg.newCanvas(1024,576), depth=true}
-    depthCanvas = {lg.newCanvas(1024 * 1.5,576 * 1.5, {format = "rgba32f"}), depth=true, readable = true} -- bigger is better shadow quality
-    shadowCanvas = {lg.newCanvas(1024,576), depth=true, format = "r16f", readable = true}
+    local w, h = love.window.getMode()
+
+    mainCanvas = {lg.newCanvas(w,h), depth=true} -- all the depth=true def don't work but g3d says to
+    postProcessCanvas = {lg.newCanvas(w,h), depth=true}
+    depthCanvas = {lg.newCanvas(w * 1.5,h * 1.5, {format = "rgba32f"}), depth=true, readable = true} -- bigger is better shadow quality
+    shadowCanvas = {lg.newCanvas(w,h), depth=true, format = "r16f", readable = true}
 
     -- nshader:send("VertexBone", {0, 0, 0, 0})
 end
