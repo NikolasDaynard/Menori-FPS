@@ -26,6 +26,7 @@ g3d.shader = require(G3D_PATH .. "/shader")
 g3d.shaderParser = require(G3D_PATH .. "/shaderParser")
 g3d.vectors = require(G3D_PATH .. "/vectors")
 g3d.collisions = require(G3D_PATH .. "/collisions")
+g3d.bones = require(G3D_PATH .. "/bones")
 
 g3d.camera.updateProjectionMatrix()
 g3d.camera.updateViewMatrix()

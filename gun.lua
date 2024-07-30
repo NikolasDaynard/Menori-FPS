@@ -56,7 +56,7 @@ function gun:render(shader)
     love.graphics.setColor(.1, .1, 1)
     gunMesh:draw(shader)
     love.graphics.setColor(1, 1, 1)
-    hitMesh:draw()
+    hitMesh:draw(shader)
 end
 
 function gun:updatePos(positionX, positionY, positionZ, playerViewDirX, playerViewDirY, playerViewDirZ)

@@ -31,6 +31,14 @@ local rollingAverage = {}
 --     print("k: " .. k .. " v: " .. tostring(v))
 -- end
 
+--[[
+    for i = 1, mesh:getVertexCount() do
+            -- The 3rd vertex attribute for a standard mesh is its color.
+            Mesh:setVertexAttribute(1, 5, vals...) -- 5 is index of VertexBone
+        end
+    end
+]]
+
 function love.load()
     settings:load()
     settings:save()
@@ -47,6 +55,8 @@ function love.load()
     postProcessCanvas = {lg.newCanvas(1024,576), depth=true}
     depthCanvas = {lg.newCanvas(1024 * 1.5,576 * 1.5, {format = "rgba32f"}), depth=true, readable = true} -- bigger is better shadow quality
     shadowCanvas = {lg.newCanvas(1024,576), depth=true, format = "r16f", readable = true}
+
+    -- nshader:send("VertexBone", {0, 0, 0, 0})
 end
 
 function love.update(dt)

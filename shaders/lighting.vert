@@ -30,13 +30,20 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
     normal = normalize(vec3(vec4(modelMatrix * VertexNormal)));
 
     // taken from hoarders house tysm
-    if (animated == true) {
+    if (VertexBone.x != 0.0) {
         debug = vec4(1, 0, 0, 0);
-        mat4 skeleton = u_pose[int(VertexBone.x*255.0)] * VertexWeight.x +
-            u_pose[int(VertexBone.y*255.0)] * VertexWeight.y +
-            u_pose[int(VertexBone.z*255.0)] * VertexWeight.z +
-            u_pose[int(VertexBone.w*255.0)] * VertexWeight.w;
-        vertex_position = skeleton * vertex_position;
+        // mat4 skeleton = u_pose[int(VertexBone.x*255.0)] * VertexWeight.x +
+        //     u_pose[int(VertexBone.y*255.0)] * VertexWeight.y +
+        //     u_pose[int(VertexBone.z*255.0)] * VertexWeight.z +
+        //     u_pose[int(VertexBone.w*255.0)] * VertexWeight.w;
+        vec4 VertexBoneReal = VertexBone;
+        vec4 skeleton = vec4(
+            vertex_position.x + VertexBoneReal.x, 
+            vertex_position.y + VertexBoneReal.y,
+            vertex_position.z + VertexBoneReal.z,
+            vertex_position.w + VertexBoneReal.w
+        );
+        vertex_position = skeleton;
     };
 
     vertexPosition = projectionMatrix * viewMatrix * modelMatrix * vertex_position;

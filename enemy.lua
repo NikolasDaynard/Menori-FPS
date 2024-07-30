@@ -176,6 +176,7 @@ end
 
 -- boss doesn't move a lot 
 function enemy:update(dt)
+    g3d.bones:test(self.tazers, dt)
 
     self.tazers:update(dt)
 

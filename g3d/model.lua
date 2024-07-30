@@ -27,6 +27,7 @@ model.vertexFormat = {
     {"VertexTexCoord", "float", 2},
     {"VertexNormal", "float", 3},
     {"VertexColor", "byte", 4},
+    {"VertexBone", "float", 4},
 }
 model.shader = require(G3D_PATH .. "/shader")
 
